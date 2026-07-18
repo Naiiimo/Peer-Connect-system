@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Star, Search, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { ProfileDialog } from "@/components/ProfileDialog";
 
 export const Route = createFileRoute("/_authenticated/student/find-tutors")({ component: FindTutors });
 
 function FindTutors() {
+  const [viewProfile, setViewProfile] = useState<string | null>(null);
   const { user, profile } = useAuth();
   const [q, setQ] = useState("");
   const [tutors, setTutors] = useState<any[]>([]);
