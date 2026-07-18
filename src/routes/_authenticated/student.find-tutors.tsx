@@ -98,17 +98,20 @@ function FindTutors() {
             "Request tutor";
           return (
             <div key={t.id} className="card-elevated flex gap-4 p-5">
-              <img src={t.photo_url ?? `https://api.dicebear.com/9.x/initials/svg?seed=${t.full_name}`} alt="" className="h-14 w-14 rounded-full object-cover" />
+              <button onClick={() => setViewProfile(t.id)} className="shrink-0">
+                <img src={t.photo_url ?? `https://api.dicebear.com/9.x/initials/svg?seed=${t.full_name}`} alt="" className="h-14 w-14 rounded-full object-cover ring-2 ring-transparent hover:ring-primary/40" />
+              </button>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="truncate font-medium">{t.full_name ?? "Tutor"}</h3>
+                  <button onClick={() => setViewProfile(t.id)} className="truncate font-medium hover:underline">{t.full_name ?? "Tutor"}</button>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground"><Star className="h-3 w-3 fill-accent text-accent" />{Number(t.avg_rating ?? 0).toFixed(1)}</span>
                 </div>
                 <p className="line-clamp-2 text-xs text-muted-foreground">{t.bio || (t.specializations ?? []).join(", ") || "USIU tutor"}</p>
                 <div className="mt-2 flex flex-wrap gap-1">
                   {(t.specializations ?? []).slice(0,3).map((s: string) => <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>)}
                 </div>
-                <div className="mt-3">
+                <div className="mt-3 flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setViewProfile(t.id)}>View profile</Button>
                   <Button size="sm" onClick={() => request(t.id)} disabled={disabled} variant={disabled ? "outline" : "default"}>
                     <Send className="mr-1 h-3 w-3" />{label}
                   </Button>
@@ -118,6 +121,7 @@ function FindTutors() {
           );
         })}
       </div>
+      <ProfileDialog userId={viewProfile} open={!!viewProfile} onOpenChange={(o) => !o && setViewProfile(null)} />
     </div>
   );
 }
