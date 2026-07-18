@@ -9,38 +9,568 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RegisterRoleRouteImport } from './routes/register.$role'
+import { Route as AuthRoleRouteImport } from './routes/auth.$role'
+import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
+import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticated/student'
+import { Route as AuthenticatedBecomeTutorRouteImport } from './routes/_authenticated/become-tutor'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedTutorIndexRouteImport } from './routes/_authenticated/tutor.index'
+import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authenticated/student.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedTutorStudentsRouteImport } from './routes/_authenticated/tutor.students'
+import { Route as AuthenticatedTutorSettingsRouteImport } from './routes/_authenticated/tutor.settings'
+import { Route as AuthenticatedTutorSessionsRouteImport } from './routes/_authenticated/tutor.sessions'
+import { Route as AuthenticatedTutorRequestsRouteImport } from './routes/_authenticated/tutor.requests'
+import { Route as AuthenticatedTutorProfileRouteImport } from './routes/_authenticated/tutor.profile'
+import { Route as AuthenticatedTutorNotificationsRouteImport } from './routes/_authenticated/tutor.notifications'
+import { Route as AuthenticatedTutorMessagesRouteImport } from './routes/_authenticated/tutor.messages'
+import { Route as AuthenticatedTutorLibraryRouteImport } from './routes/_authenticated/tutor.library'
+import { Route as AuthenticatedTutorAvailabilityRouteImport } from './routes/_authenticated/tutor.availability'
+import { Route as AuthenticatedStudentTutorsRouteImport } from './routes/_authenticated/student.tutors'
+import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated/student.settings'
+import { Route as AuthenticatedStudentScheduleRouteImport } from './routes/_authenticated/student.schedule'
+import { Route as AuthenticatedStudentResearchRouteImport } from './routes/_authenticated/student.research'
+import { Route as AuthenticatedStudentProfileRouteImport } from './routes/_authenticated/student.profile'
+import { Route as AuthenticatedStudentNotificationsRouteImport } from './routes/_authenticated/student.notifications'
+import { Route as AuthenticatedStudentMessagesRouteImport } from './routes/_authenticated/student.messages'
+import { Route as AuthenticatedStudentLibraryRouteImport } from './routes/_authenticated/student.library'
+import { Route as AuthenticatedStudentGroupsRouteImport } from './routes/_authenticated/student.groups'
+import { Route as AuthenticatedStudentFindTutorsRouteImport } from './routes/_authenticated/student.find-tutors'
+import { Route as AuthenticatedStudentFeedbackRouteImport } from './routes/_authenticated/student.feedback'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminDeletionsRouteImport } from './routes/_authenticated/admin.deletions'
+import { Route as ApiPublicHooksSessionRemindersRouteImport } from './routes/api/public/hooks/session-reminders'
+import { Route as AuthenticatedStudentGroupsIdRouteImport } from './routes/_authenticated/student.groups.$id'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterRoleRoute = RegisterRoleRouteImport.update({
+  id: '/register/$role',
+  path: '/register/$role',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoleRoute = AuthRoleRouteImport.update({
+  id: '/auth/$role',
+  path: '/auth/$role',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTutorRoute = AuthenticatedTutorRouteImport.update({
+  id: '/tutor',
+  path: '/tutor',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStudentRoute = AuthenticatedStudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBecomeTutorRoute =
+  AuthenticatedBecomeTutorRouteImport.update({
+    id: '/become-tutor',
+    path: '/become-tutor',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTutorIndexRoute = AuthenticatedTutorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedTutorRoute,
+} as any)
+const AuthenticatedStudentIndexRoute =
+  AuthenticatedStudentIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedTutorStudentsRoute =
+  AuthenticatedTutorStudentsRouteImport.update({
+    id: '/students',
+    path: '/students',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorSettingsRoute =
+  AuthenticatedTutorSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorSessionsRoute =
+  AuthenticatedTutorSessionsRouteImport.update({
+    id: '/sessions',
+    path: '/sessions',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorRequestsRoute =
+  AuthenticatedTutorRequestsRouteImport.update({
+    id: '/requests',
+    path: '/requests',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorProfileRoute =
+  AuthenticatedTutorProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorNotificationsRoute =
+  AuthenticatedTutorNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorMessagesRoute =
+  AuthenticatedTutorMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorLibraryRoute =
+  AuthenticatedTutorLibraryRouteImport.update({
+    id: '/library',
+    path: '/library',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorAvailabilityRoute =
+  AuthenticatedTutorAvailabilityRouteImport.update({
+    id: '/availability',
+    path: '/availability',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedStudentTutorsRoute =
+  AuthenticatedStudentTutorsRouteImport.update({
+    id: '/tutors',
+    path: '/tutors',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentSettingsRoute =
+  AuthenticatedStudentSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentScheduleRoute =
+  AuthenticatedStudentScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentResearchRoute =
+  AuthenticatedStudentResearchRouteImport.update({
+    id: '/research',
+    path: '/research',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentProfileRoute =
+  AuthenticatedStudentProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentNotificationsRoute =
+  AuthenticatedStudentNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentMessagesRoute =
+  AuthenticatedStudentMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentLibraryRoute =
+  AuthenticatedStudentLibraryRouteImport.update({
+    id: '/library',
+    path: '/library',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentGroupsRoute =
+  AuthenticatedStudentGroupsRouteImport.update({
+    id: '/groups',
+    path: '/groups',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentFindTutorsRoute =
+  AuthenticatedStudentFindTutorsRouteImport.update({
+    id: '/find-tutors',
+    path: '/find-tutors',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedStudentFeedbackRoute =
+  AuthenticatedStudentFeedbackRouteImport.update({
+    id: '/feedback',
+    path: '/feedback',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminDeletionsRoute =
+  AuthenticatedAdminDeletionsRouteImport.update({
+    id: '/deletions',
+    path: '/deletions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const ApiPublicHooksSessionRemindersRoute =
+  ApiPublicHooksSessionRemindersRouteImport.update({
+    id: '/api/public/hooks/session-reminders',
+    path: '/api/public/hooks/session-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedStudentGroupsIdRoute =
+  AuthenticatedStudentGroupsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedStudentGroupsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/settings': typeof SettingsRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/become-tutor': typeof AuthenticatedBecomeTutorRoute
+  '/student': typeof AuthenticatedStudentRouteWithChildren
+  '/tutor': typeof AuthenticatedTutorRouteWithChildren
+  '/auth/$role': typeof AuthRoleRoute
+  '/register/$role': typeof RegisterRoleRoute
+  '/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/student/feedback': typeof AuthenticatedStudentFeedbackRoute
+  '/student/find-tutors': typeof AuthenticatedStudentFindTutorsRoute
+  '/student/groups': typeof AuthenticatedStudentGroupsRouteWithChildren
+  '/student/library': typeof AuthenticatedStudentLibraryRoute
+  '/student/messages': typeof AuthenticatedStudentMessagesRoute
+  '/student/notifications': typeof AuthenticatedStudentNotificationsRoute
+  '/student/profile': typeof AuthenticatedStudentProfileRoute
+  '/student/research': typeof AuthenticatedStudentResearchRoute
+  '/student/schedule': typeof AuthenticatedStudentScheduleRoute
+  '/student/settings': typeof AuthenticatedStudentSettingsRoute
+  '/student/tutors': typeof AuthenticatedStudentTutorsRoute
+  '/tutor/availability': typeof AuthenticatedTutorAvailabilityRoute
+  '/tutor/library': typeof AuthenticatedTutorLibraryRoute
+  '/tutor/messages': typeof AuthenticatedTutorMessagesRoute
+  '/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
+  '/tutor/profile': typeof AuthenticatedTutorProfileRoute
+  '/tutor/requests': typeof AuthenticatedTutorRequestsRoute
+  '/tutor/sessions': typeof AuthenticatedTutorSessionsRoute
+  '/tutor/settings': typeof AuthenticatedTutorSettingsRoute
+  '/tutor/students': typeof AuthenticatedTutorStudentsRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/student/': typeof AuthenticatedStudentIndexRoute
+  '/tutor/': typeof AuthenticatedTutorIndexRoute
+  '/student/groups/$id': typeof AuthenticatedStudentGroupsIdRoute
+  '/api/public/hooks/session-reminders': typeof ApiPublicHooksSessionRemindersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/settings': typeof SettingsRoute
+  '/become-tutor': typeof AuthenticatedBecomeTutorRoute
+  '/auth/$role': typeof AuthRoleRoute
+  '/register/$role': typeof RegisterRoleRoute
+  '/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/student/feedback': typeof AuthenticatedStudentFeedbackRoute
+  '/student/find-tutors': typeof AuthenticatedStudentFindTutorsRoute
+  '/student/groups': typeof AuthenticatedStudentGroupsRouteWithChildren
+  '/student/library': typeof AuthenticatedStudentLibraryRoute
+  '/student/messages': typeof AuthenticatedStudentMessagesRoute
+  '/student/notifications': typeof AuthenticatedStudentNotificationsRoute
+  '/student/profile': typeof AuthenticatedStudentProfileRoute
+  '/student/research': typeof AuthenticatedStudentResearchRoute
+  '/student/schedule': typeof AuthenticatedStudentScheduleRoute
+  '/student/settings': typeof AuthenticatedStudentSettingsRoute
+  '/student/tutors': typeof AuthenticatedStudentTutorsRoute
+  '/tutor/availability': typeof AuthenticatedTutorAvailabilityRoute
+  '/tutor/library': typeof AuthenticatedTutorLibraryRoute
+  '/tutor/messages': typeof AuthenticatedTutorMessagesRoute
+  '/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
+  '/tutor/profile': typeof AuthenticatedTutorProfileRoute
+  '/tutor/requests': typeof AuthenticatedTutorRequestsRoute
+  '/tutor/sessions': typeof AuthenticatedTutorSessionsRoute
+  '/tutor/settings': typeof AuthenticatedTutorSettingsRoute
+  '/tutor/students': typeof AuthenticatedTutorStudentsRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/student': typeof AuthenticatedStudentIndexRoute
+  '/tutor': typeof AuthenticatedTutorIndexRoute
+  '/student/groups/$id': typeof AuthenticatedStudentGroupsIdRoute
+  '/api/public/hooks/session-reminders': typeof ApiPublicHooksSessionRemindersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/admin-login': typeof AdminLoginRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/settings': typeof SettingsRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/become-tutor': typeof AuthenticatedBecomeTutorRoute
+  '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
+  '/_authenticated/tutor': typeof AuthenticatedTutorRouteWithChildren
+  '/auth/$role': typeof AuthRoleRoute
+  '/register/$role': typeof RegisterRoleRoute
+  '/_authenticated/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/student/feedback': typeof AuthenticatedStudentFeedbackRoute
+  '/_authenticated/student/find-tutors': typeof AuthenticatedStudentFindTutorsRoute
+  '/_authenticated/student/groups': typeof AuthenticatedStudentGroupsRouteWithChildren
+  '/_authenticated/student/library': typeof AuthenticatedStudentLibraryRoute
+  '/_authenticated/student/messages': typeof AuthenticatedStudentMessagesRoute
+  '/_authenticated/student/notifications': typeof AuthenticatedStudentNotificationsRoute
+  '/_authenticated/student/profile': typeof AuthenticatedStudentProfileRoute
+  '/_authenticated/student/research': typeof AuthenticatedStudentResearchRoute
+  '/_authenticated/student/schedule': typeof AuthenticatedStudentScheduleRoute
+  '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
+  '/_authenticated/student/tutors': typeof AuthenticatedStudentTutorsRoute
+  '/_authenticated/tutor/availability': typeof AuthenticatedTutorAvailabilityRoute
+  '/_authenticated/tutor/library': typeof AuthenticatedTutorLibraryRoute
+  '/_authenticated/tutor/messages': typeof AuthenticatedTutorMessagesRoute
+  '/_authenticated/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
+  '/_authenticated/tutor/profile': typeof AuthenticatedTutorProfileRoute
+  '/_authenticated/tutor/requests': typeof AuthenticatedTutorRequestsRoute
+  '/_authenticated/tutor/sessions': typeof AuthenticatedTutorSessionsRoute
+  '/_authenticated/tutor/settings': typeof AuthenticatedTutorSettingsRoute
+  '/_authenticated/tutor/students': typeof AuthenticatedTutorStudentsRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/student/': typeof AuthenticatedStudentIndexRoute
+  '/_authenticated/tutor/': typeof AuthenticatedTutorIndexRoute
+  '/_authenticated/student/groups/$id': typeof AuthenticatedStudentGroupsIdRoute
+  '/api/public/hooks/session-reminders': typeof ApiPublicHooksSessionRemindersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin-login'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/settings'
+    | '/admin'
+    | '/become-tutor'
+    | '/student'
+    | '/tutor'
+    | '/auth/$role'
+    | '/register/$role'
+    | '/admin/deletions'
+    | '/admin/reports'
+    | '/admin/users'
+    | '/student/feedback'
+    | '/student/find-tutors'
+    | '/student/groups'
+    | '/student/library'
+    | '/student/messages'
+    | '/student/notifications'
+    | '/student/profile'
+    | '/student/research'
+    | '/student/schedule'
+    | '/student/settings'
+    | '/student/tutors'
+    | '/tutor/availability'
+    | '/tutor/library'
+    | '/tutor/messages'
+    | '/tutor/notifications'
+    | '/tutor/profile'
+    | '/tutor/requests'
+    | '/tutor/sessions'
+    | '/tutor/settings'
+    | '/tutor/students'
+    | '/admin/'
+    | '/student/'
+    | '/tutor/'
+    | '/student/groups/$id'
+    | '/api/public/hooks/session-reminders'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin-login'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/settings'
+    | '/become-tutor'
+    | '/auth/$role'
+    | '/register/$role'
+    | '/admin/deletions'
+    | '/admin/reports'
+    | '/admin/users'
+    | '/student/feedback'
+    | '/student/find-tutors'
+    | '/student/groups'
+    | '/student/library'
+    | '/student/messages'
+    | '/student/notifications'
+    | '/student/profile'
+    | '/student/research'
+    | '/student/schedule'
+    | '/student/settings'
+    | '/student/tutors'
+    | '/tutor/availability'
+    | '/tutor/library'
+    | '/tutor/messages'
+    | '/tutor/notifications'
+    | '/tutor/profile'
+    | '/tutor/requests'
+    | '/tutor/sessions'
+    | '/tutor/settings'
+    | '/tutor/students'
+    | '/admin'
+    | '/student'
+    | '/tutor'
+    | '/student/groups/$id'
+    | '/api/public/hooks/session-reminders'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/admin-login'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/settings'
+    | '/_authenticated/admin'
+    | '/_authenticated/become-tutor'
+    | '/_authenticated/student'
+    | '/_authenticated/tutor'
+    | '/auth/$role'
+    | '/register/$role'
+    | '/_authenticated/admin/deletions'
+    | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/users'
+    | '/_authenticated/student/feedback'
+    | '/_authenticated/student/find-tutors'
+    | '/_authenticated/student/groups'
+    | '/_authenticated/student/library'
+    | '/_authenticated/student/messages'
+    | '/_authenticated/student/notifications'
+    | '/_authenticated/student/profile'
+    | '/_authenticated/student/research'
+    | '/_authenticated/student/schedule'
+    | '/_authenticated/student/settings'
+    | '/_authenticated/student/tutors'
+    | '/_authenticated/tutor/availability'
+    | '/_authenticated/tutor/library'
+    | '/_authenticated/tutor/messages'
+    | '/_authenticated/tutor/notifications'
+    | '/_authenticated/tutor/profile'
+    | '/_authenticated/tutor/requests'
+    | '/_authenticated/tutor/sessions'
+    | '/_authenticated/tutor/settings'
+    | '/_authenticated/tutor/students'
+    | '/_authenticated/admin/'
+    | '/_authenticated/student/'
+    | '/_authenticated/tutor/'
+    | '/_authenticated/student/groups/$id'
+    | '/api/public/hooks/session-reminders'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SettingsRoute: typeof SettingsRoute
+  AuthRoleRoute: typeof AuthRoleRoute
+  RegisterRoleRoute: typeof RegisterRoleRoute
+  ApiPublicHooksSessionRemindersRoute: typeof ApiPublicHooksSessionRemindersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +578,369 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register/$role': {
+      id: '/register/$role'
+      path: '/register/$role'
+      fullPath: '/register/$role'
+      preLoaderRoute: typeof RegisterRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/$role': {
+      id: '/auth/$role'
+      path: '/auth/$role'
+      fullPath: '/auth/$role'
+      preLoaderRoute: typeof AuthRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tutor': {
+      id: '/_authenticated/tutor'
+      path: '/tutor'
+      fullPath: '/tutor'
+      preLoaderRoute: typeof AuthenticatedTutorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/student': {
+      id: '/_authenticated/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof AuthenticatedStudentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/become-tutor': {
+      id: '/_authenticated/become-tutor'
+      path: '/become-tutor'
+      fullPath: '/become-tutor'
+      preLoaderRoute: typeof AuthenticatedBecomeTutorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tutor/': {
+      id: '/_authenticated/tutor/'
+      path: '/'
+      fullPath: '/tutor/'
+      preLoaderRoute: typeof AuthenticatedTutorIndexRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/student/': {
+      id: '/_authenticated/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof AuthenticatedStudentIndexRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/tutor/students': {
+      id: '/_authenticated/tutor/students'
+      path: '/students'
+      fullPath: '/tutor/students'
+      preLoaderRoute: typeof AuthenticatedTutorStudentsRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/settings': {
+      id: '/_authenticated/tutor/settings'
+      path: '/settings'
+      fullPath: '/tutor/settings'
+      preLoaderRoute: typeof AuthenticatedTutorSettingsRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/sessions': {
+      id: '/_authenticated/tutor/sessions'
+      path: '/sessions'
+      fullPath: '/tutor/sessions'
+      preLoaderRoute: typeof AuthenticatedTutorSessionsRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/requests': {
+      id: '/_authenticated/tutor/requests'
+      path: '/requests'
+      fullPath: '/tutor/requests'
+      preLoaderRoute: typeof AuthenticatedTutorRequestsRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/profile': {
+      id: '/_authenticated/tutor/profile'
+      path: '/profile'
+      fullPath: '/tutor/profile'
+      preLoaderRoute: typeof AuthenticatedTutorProfileRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/notifications': {
+      id: '/_authenticated/tutor/notifications'
+      path: '/notifications'
+      fullPath: '/tutor/notifications'
+      preLoaderRoute: typeof AuthenticatedTutorNotificationsRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/messages': {
+      id: '/_authenticated/tutor/messages'
+      path: '/messages'
+      fullPath: '/tutor/messages'
+      preLoaderRoute: typeof AuthenticatedTutorMessagesRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/library': {
+      id: '/_authenticated/tutor/library'
+      path: '/library'
+      fullPath: '/tutor/library'
+      preLoaderRoute: typeof AuthenticatedTutorLibraryRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/availability': {
+      id: '/_authenticated/tutor/availability'
+      path: '/availability'
+      fullPath: '/tutor/availability'
+      preLoaderRoute: typeof AuthenticatedTutorAvailabilityRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/student/tutors': {
+      id: '/_authenticated/student/tutors'
+      path: '/tutors'
+      fullPath: '/student/tutors'
+      preLoaderRoute: typeof AuthenticatedStudentTutorsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/settings': {
+      id: '/_authenticated/student/settings'
+      path: '/settings'
+      fullPath: '/student/settings'
+      preLoaderRoute: typeof AuthenticatedStudentSettingsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/schedule': {
+      id: '/_authenticated/student/schedule'
+      path: '/schedule'
+      fullPath: '/student/schedule'
+      preLoaderRoute: typeof AuthenticatedStudentScheduleRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/research': {
+      id: '/_authenticated/student/research'
+      path: '/research'
+      fullPath: '/student/research'
+      preLoaderRoute: typeof AuthenticatedStudentResearchRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/profile': {
+      id: '/_authenticated/student/profile'
+      path: '/profile'
+      fullPath: '/student/profile'
+      preLoaderRoute: typeof AuthenticatedStudentProfileRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/notifications': {
+      id: '/_authenticated/student/notifications'
+      path: '/notifications'
+      fullPath: '/student/notifications'
+      preLoaderRoute: typeof AuthenticatedStudentNotificationsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/messages': {
+      id: '/_authenticated/student/messages'
+      path: '/messages'
+      fullPath: '/student/messages'
+      preLoaderRoute: typeof AuthenticatedStudentMessagesRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/library': {
+      id: '/_authenticated/student/library'
+      path: '/library'
+      fullPath: '/student/library'
+      preLoaderRoute: typeof AuthenticatedStudentLibraryRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/groups': {
+      id: '/_authenticated/student/groups'
+      path: '/groups'
+      fullPath: '/student/groups'
+      preLoaderRoute: typeof AuthenticatedStudentGroupsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/find-tutors': {
+      id: '/_authenticated/student/find-tutors'
+      path: '/find-tutors'
+      fullPath: '/student/find-tutors'
+      preLoaderRoute: typeof AuthenticatedStudentFindTutorsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/student/feedback': {
+      id: '/_authenticated/student/feedback'
+      path: '/feedback'
+      fullPath: '/student/feedback'
+      preLoaderRoute: typeof AuthenticatedStudentFeedbackRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/deletions': {
+      id: '/_authenticated/admin/deletions'
+      path: '/deletions'
+      fullPath: '/admin/deletions'
+      preLoaderRoute: typeof AuthenticatedAdminDeletionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/hooks/session-reminders': {
+      id: '/api/public/hooks/session-reminders'
+      path: '/api/public/hooks/session-reminders'
+      fullPath: '/api/public/hooks/session-reminders'
+      preLoaderRoute: typeof ApiPublicHooksSessionRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/student/groups/$id': {
+      id: '/_authenticated/student/groups/$id'
+      path: '/$id'
+      fullPath: '/student/groups/$id'
+      preLoaderRoute: typeof AuthenticatedStudentGroupsIdRouteImport
+      parentRoute: typeof AuthenticatedStudentGroupsRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminDeletionsRoute: typeof AuthenticatedAdminDeletionsRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminDeletionsRoute: AuthenticatedAdminDeletionsRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedStudentGroupsRouteChildren {
+  AuthenticatedStudentGroupsIdRoute: typeof AuthenticatedStudentGroupsIdRoute
+}
+
+const AuthenticatedStudentGroupsRouteChildren: AuthenticatedStudentGroupsRouteChildren =
+  {
+    AuthenticatedStudentGroupsIdRoute: AuthenticatedStudentGroupsIdRoute,
+  }
+
+const AuthenticatedStudentGroupsRouteWithChildren =
+  AuthenticatedStudentGroupsRoute._addFileChildren(
+    AuthenticatedStudentGroupsRouteChildren,
+  )
+
+interface AuthenticatedStudentRouteChildren {
+  AuthenticatedStudentFeedbackRoute: typeof AuthenticatedStudentFeedbackRoute
+  AuthenticatedStudentFindTutorsRoute: typeof AuthenticatedStudentFindTutorsRoute
+  AuthenticatedStudentGroupsRoute: typeof AuthenticatedStudentGroupsRouteWithChildren
+  AuthenticatedStudentLibraryRoute: typeof AuthenticatedStudentLibraryRoute
+  AuthenticatedStudentMessagesRoute: typeof AuthenticatedStudentMessagesRoute
+  AuthenticatedStudentNotificationsRoute: typeof AuthenticatedStudentNotificationsRoute
+  AuthenticatedStudentProfileRoute: typeof AuthenticatedStudentProfileRoute
+  AuthenticatedStudentResearchRoute: typeof AuthenticatedStudentResearchRoute
+  AuthenticatedStudentScheduleRoute: typeof AuthenticatedStudentScheduleRoute
+  AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
+  AuthenticatedStudentTutorsRoute: typeof AuthenticatedStudentTutorsRoute
+  AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
+}
+
+const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
+  AuthenticatedStudentFeedbackRoute: AuthenticatedStudentFeedbackRoute,
+  AuthenticatedStudentFindTutorsRoute: AuthenticatedStudentFindTutorsRoute,
+  AuthenticatedStudentGroupsRoute: AuthenticatedStudentGroupsRouteWithChildren,
+  AuthenticatedStudentLibraryRoute: AuthenticatedStudentLibraryRoute,
+  AuthenticatedStudentMessagesRoute: AuthenticatedStudentMessagesRoute,
+  AuthenticatedStudentNotificationsRoute:
+    AuthenticatedStudentNotificationsRoute,
+  AuthenticatedStudentProfileRoute: AuthenticatedStudentProfileRoute,
+  AuthenticatedStudentResearchRoute: AuthenticatedStudentResearchRoute,
+  AuthenticatedStudentScheduleRoute: AuthenticatedStudentScheduleRoute,
+  AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
+  AuthenticatedStudentTutorsRoute: AuthenticatedStudentTutorsRoute,
+  AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
+}
+
+const AuthenticatedStudentRouteWithChildren =
+  AuthenticatedStudentRoute._addFileChildren(AuthenticatedStudentRouteChildren)
+
+interface AuthenticatedTutorRouteChildren {
+  AuthenticatedTutorAvailabilityRoute: typeof AuthenticatedTutorAvailabilityRoute
+  AuthenticatedTutorLibraryRoute: typeof AuthenticatedTutorLibraryRoute
+  AuthenticatedTutorMessagesRoute: typeof AuthenticatedTutorMessagesRoute
+  AuthenticatedTutorNotificationsRoute: typeof AuthenticatedTutorNotificationsRoute
+  AuthenticatedTutorProfileRoute: typeof AuthenticatedTutorProfileRoute
+  AuthenticatedTutorRequestsRoute: typeof AuthenticatedTutorRequestsRoute
+  AuthenticatedTutorSessionsRoute: typeof AuthenticatedTutorSessionsRoute
+  AuthenticatedTutorSettingsRoute: typeof AuthenticatedTutorSettingsRoute
+  AuthenticatedTutorStudentsRoute: typeof AuthenticatedTutorStudentsRoute
+  AuthenticatedTutorIndexRoute: typeof AuthenticatedTutorIndexRoute
+}
+
+const AuthenticatedTutorRouteChildren: AuthenticatedTutorRouteChildren = {
+  AuthenticatedTutorAvailabilityRoute: AuthenticatedTutorAvailabilityRoute,
+  AuthenticatedTutorLibraryRoute: AuthenticatedTutorLibraryRoute,
+  AuthenticatedTutorMessagesRoute: AuthenticatedTutorMessagesRoute,
+  AuthenticatedTutorNotificationsRoute: AuthenticatedTutorNotificationsRoute,
+  AuthenticatedTutorProfileRoute: AuthenticatedTutorProfileRoute,
+  AuthenticatedTutorRequestsRoute: AuthenticatedTutorRequestsRoute,
+  AuthenticatedTutorSessionsRoute: AuthenticatedTutorSessionsRoute,
+  AuthenticatedTutorSettingsRoute: AuthenticatedTutorSettingsRoute,
+  AuthenticatedTutorStudentsRoute: AuthenticatedTutorStudentsRoute,
+  AuthenticatedTutorIndexRoute: AuthenticatedTutorIndexRoute,
+}
+
+const AuthenticatedTutorRouteWithChildren =
+  AuthenticatedTutorRoute._addFileChildren(AuthenticatedTutorRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedBecomeTutorRoute: typeof AuthenticatedBecomeTutorRoute
+  AuthenticatedStudentRoute: typeof AuthenticatedStudentRouteWithChildren
+  AuthenticatedTutorRoute: typeof AuthenticatedTutorRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedBecomeTutorRoute: AuthenticatedBecomeTutorRoute,
+  AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
+  AuthenticatedTutorRoute: AuthenticatedTutorRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SettingsRoute: SettingsRoute,
+  AuthRoleRoute: AuthRoleRoute,
+  RegisterRoleRoute: RegisterRoleRoute,
+  ApiPublicHooksSessionRemindersRoute: ApiPublicHooksSessionRemindersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
