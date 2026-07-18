@@ -10,7 +10,7 @@ import { searchPapers, summarizePaper, type Paper } from "@/lib/research.functio
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute("/_authenticated/student/research")({ component: ResearchPage });
+export const Route = createFileRoute("/_authenticated/tutor/research")({ component: ResearchPage });
 
 type CiteStyle = "APA" | "MLA" | "IEEE" | "Harvard";
 

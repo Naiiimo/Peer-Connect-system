@@ -27,6 +27,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTutorStudentsRouteImport } from './routes/_authenticated/tutor.students'
 import { Route as AuthenticatedTutorSettingsRouteImport } from './routes/_authenticated/tutor.settings'
 import { Route as AuthenticatedTutorSessionsRouteImport } from './routes/_authenticated/tutor.sessions'
+import { Route as AuthenticatedTutorResearchRouteImport } from './routes/_authenticated/tutor.research'
 import { Route as AuthenticatedTutorRequestsRouteImport } from './routes/_authenticated/tutor.requests'
 import { Route as AuthenticatedTutorProfileRouteImport } from './routes/_authenticated/tutor.profile'
 import { Route as AuthenticatedTutorNotificationsRouteImport } from './routes/_authenticated/tutor.notifications'
@@ -142,6 +143,12 @@ const AuthenticatedTutorSessionsRoute =
   AuthenticatedTutorSessionsRouteImport.update({
     id: '/sessions',
     path: '/sessions',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
+const AuthenticatedTutorResearchRoute =
+  AuthenticatedTutorResearchRouteImport.update({
+    id: '/research',
+    path: '/research',
     getParentRoute: () => AuthenticatedTutorRoute,
   } as any)
 const AuthenticatedTutorRequestsRoute =
@@ -308,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
   '/tutor/profile': typeof AuthenticatedTutorProfileRoute
   '/tutor/requests': typeof AuthenticatedTutorRequestsRoute
+  '/tutor/research': typeof AuthenticatedTutorResearchRoute
   '/tutor/sessions': typeof AuthenticatedTutorSessionsRoute
   '/tutor/settings': typeof AuthenticatedTutorSettingsRoute
   '/tutor/students': typeof AuthenticatedTutorStudentsRoute
@@ -346,6 +354,7 @@ export interface FileRoutesByTo {
   '/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
   '/tutor/profile': typeof AuthenticatedTutorProfileRoute
   '/tutor/requests': typeof AuthenticatedTutorRequestsRoute
+  '/tutor/research': typeof AuthenticatedTutorResearchRoute
   '/tutor/sessions': typeof AuthenticatedTutorSessionsRoute
   '/tutor/settings': typeof AuthenticatedTutorSettingsRoute
   '/tutor/students': typeof AuthenticatedTutorStudentsRoute
@@ -389,6 +398,7 @@ export interface FileRoutesById {
   '/_authenticated/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
   '/_authenticated/tutor/profile': typeof AuthenticatedTutorProfileRoute
   '/_authenticated/tutor/requests': typeof AuthenticatedTutorRequestsRoute
+  '/_authenticated/tutor/research': typeof AuthenticatedTutorResearchRoute
   '/_authenticated/tutor/sessions': typeof AuthenticatedTutorSessionsRoute
   '/_authenticated/tutor/settings': typeof AuthenticatedTutorSettingsRoute
   '/_authenticated/tutor/students': typeof AuthenticatedTutorStudentsRoute
@@ -432,6 +442,7 @@ export interface FileRouteTypes {
     | '/tutor/notifications'
     | '/tutor/profile'
     | '/tutor/requests'
+    | '/tutor/research'
     | '/tutor/sessions'
     | '/tutor/settings'
     | '/tutor/students'
@@ -470,6 +481,7 @@ export interface FileRouteTypes {
     | '/tutor/notifications'
     | '/tutor/profile'
     | '/tutor/requests'
+    | '/tutor/research'
     | '/tutor/sessions'
     | '/tutor/settings'
     | '/tutor/students'
@@ -512,6 +524,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tutor/notifications'
     | '/_authenticated/tutor/profile'
     | '/_authenticated/tutor/requests'
+    | '/_authenticated/tutor/research'
     | '/_authenticated/tutor/sessions'
     | '/_authenticated/tutor/settings'
     | '/_authenticated/tutor/students'
@@ -660,6 +673,13 @@ declare module '@tanstack/react-router' {
       path: '/sessions'
       fullPath: '/tutor/sessions'
       preLoaderRoute: typeof AuthenticatedTutorSessionsRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
+    '/_authenticated/tutor/research': {
+      id: '/_authenticated/tutor/research'
+      path: '/research'
+      fullPath: '/tutor/research'
+      preLoaderRoute: typeof AuthenticatedTutorResearchRouteImport
       parentRoute: typeof AuthenticatedTutorRoute
     }
     '/_authenticated/tutor/requests': {
@@ -891,6 +911,7 @@ interface AuthenticatedTutorRouteChildren {
   AuthenticatedTutorNotificationsRoute: typeof AuthenticatedTutorNotificationsRoute
   AuthenticatedTutorProfileRoute: typeof AuthenticatedTutorProfileRoute
   AuthenticatedTutorRequestsRoute: typeof AuthenticatedTutorRequestsRoute
+  AuthenticatedTutorResearchRoute: typeof AuthenticatedTutorResearchRoute
   AuthenticatedTutorSessionsRoute: typeof AuthenticatedTutorSessionsRoute
   AuthenticatedTutorSettingsRoute: typeof AuthenticatedTutorSettingsRoute
   AuthenticatedTutorStudentsRoute: typeof AuthenticatedTutorStudentsRoute
@@ -904,6 +925,7 @@ const AuthenticatedTutorRouteChildren: AuthenticatedTutorRouteChildren = {
   AuthenticatedTutorNotificationsRoute: AuthenticatedTutorNotificationsRoute,
   AuthenticatedTutorProfileRoute: AuthenticatedTutorProfileRoute,
   AuthenticatedTutorRequestsRoute: AuthenticatedTutorRequestsRoute,
+  AuthenticatedTutorResearchRoute: AuthenticatedTutorResearchRoute,
   AuthenticatedTutorSessionsRoute: AuthenticatedTutorSessionsRoute,
   AuthenticatedTutorSettingsRoute: AuthenticatedTutorSettingsRoute,
   AuthenticatedTutorStudentsRoute: AuthenticatedTutorStudentsRoute,
