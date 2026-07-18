@@ -86,11 +86,41 @@ export function Messenger() {
           {messages.map((m) => {
             const mine = m.sender_id === user?.id;
             return (
-              <div key={m.id} className={`mb-2 flex ${mine ? "justify-end" : ""}`}>
+              <div key={m.id} className={`group mb-2 flex items-end gap-1 ${mine ? "justify-end" : ""}`}>
+                {mine && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const { error } = await supabase.from("messages").delete().eq("id", m.id);
+                      if (error) return toast.error(error.message);
+                      setMessages((prev) => prev.filter((x) => x.id !== m.id));
+                    }}
+                    className="opacity-0 transition group-hover:opacity-100"
+                    aria-label="Delete message"
+                    title="Delete message"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                  </button>
+                )}
                 <div className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${mine ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
                   {m.body}
                   <div className="mt-0.5 text-[9px] opacity-70">{new Date(m.created_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" })}</div>
                 </div>
+                {!mine && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const { error } = await supabase.from("messages").delete().eq("id", m.id);
+                      if (error) return toast.error(error.message);
+                      setMessages((prev) => prev.filter((x) => x.id !== m.id));
+                    }}
+                    className="opacity-0 transition group-hover:opacity-100"
+                    aria-label="Delete message"
+                    title="Delete message"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                  </button>
+                )}
               </div>
             );
           })}
