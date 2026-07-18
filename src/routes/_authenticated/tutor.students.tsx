@@ -45,16 +45,20 @@ function Students() {
         {rows.length === 0 && <p className="text-sm text-muted-foreground">No accepted students yet.</p>}
         {rows.map((r) => (
           <div key={r.student_id} className="card-elevated flex items-center gap-3 p-4">
-            <img src={r.student?.photo_url ?? `https://api.dicebear.com/9.x/initials/svg?seed=${r.student?.full_name}`} className="h-10 w-10 rounded-full object-cover" alt="" />
+            <button onClick={() => setViewProfile(r.student_id)} className="shrink-0">
+              <img src={r.student?.photo_url ?? `https://api.dicebear.com/9.x/initials/svg?seed=${r.student?.full_name}`} className="h-10 w-10 rounded-full object-cover ring-2 ring-transparent hover:ring-primary/40" alt="" />
+            </button>
             <div className="min-w-0 flex-1">
-              <div className="truncate font-medium">{r.student?.full_name}</div>
+              <button onClick={() => setViewProfile(r.student_id)} className="truncate font-medium hover:underline">{r.student?.full_name}</button>
               <div className="text-xs text-muted-foreground">{r.student?.programme} · Y{r.student?.year_of_study}</div>
             </div>
+            <Button size="sm" variant="outline" onClick={() => setViewProfile(r.student_id)}>Profile</Button>
             <Link to="/tutor/messages"><Button size="icon" variant="outline"><MessageSquare className="h-4 w-4" /></Button></Link>
             <Button size="sm" onClick={() => setScheduleFor(r)}><Video className="mr-1 h-3 w-3" /> Schedule</Button>
           </div>
         ))}
       </div>
+      <ProfileDialog userId={viewProfile} open={!!viewProfile} onOpenChange={(o) => !o && setViewProfile(null)} />
 
       <Dialog open={!!scheduleFor} onOpenChange={(o) => !o && setScheduleFor(null)}>
         <DialogContent>
