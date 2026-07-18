@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MessageSquare, Video } from "lucide-react";
 import { toast } from "sonner";
+import { ProfileDialog } from "@/components/ProfileDialog";
 
 export const Route = createFileRoute("/_authenticated/tutor/students")({ component: Students });
 
@@ -20,6 +21,7 @@ function Students() {
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [zoom, setZoom] = useState("");
+  const [viewProfile, setViewProfile] = useState<string | null>(null);
 
   const load = async () => {
     if (!user) return;
