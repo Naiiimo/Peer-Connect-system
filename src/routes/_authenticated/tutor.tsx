@@ -26,6 +26,7 @@ function TutorLayout() {
     { to: "/tutor/availability", label: "Availability", icon: Calendar },
     { to: "/tutor/sessions", label: "Sessions", icon: Video },
     { to: "/tutor/library", label: "Library", icon: Library },
+    { to: "/tutor/research", label: "Research", icon: BookOpen },
     { to: "/tutor/notifications", label: "Notifications", icon: Bell },
     { to: "/tutor/profile", label: "Profile", icon: User },
     { to: "/tutor/settings", label: "Settings", icon: Settings },
