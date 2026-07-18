@@ -201,7 +201,8 @@ function MyTutors() {
                 </div>
               )}
 
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => setViewProfile(r.tutor_id)}>View profile</Button>
                 <Link to="/student/messages"><Button size="sm" variant="outline"><MessageSquare className="mr-1 h-3 w-3" /> Message</Button></Link>
                 {r.status === "accepted" && (
                   <Button size="sm" onClick={() => setBooking({ tutorId: r.tutor_id, tutorName: r.tutor?.full_name ?? "Tutor" })}>
@@ -213,6 +214,7 @@ function MyTutors() {
           );
         })}
       </div>
+      <ProfileDialog userId={viewProfile} open={!!viewProfile} onOpenChange={(o) => !o && setViewProfile(null)} />
 
       <Dialog open={!!booking} onOpenChange={(o) => { if (!o) { setBooking(null); setPickedSlot(null); setTopic(""); } }}>
         <DialogContent>
