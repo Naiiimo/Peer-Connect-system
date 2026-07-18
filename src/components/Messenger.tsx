@@ -37,12 +37,18 @@ export function Messenger() {
       setMessages(data ?? []);
       await supabase.from("messages").update({ read_at: new Date().toISOString() }).eq("recipient_id", user.id).eq("sender_id", selected).is("read_at", null);
     })();
-    const ch = supabase.channel(`dm:${selected}`).on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (p) => {
-      const m: any = p.new;
-      if ((m.sender_id === user.id && m.recipient_id === selected) || (m.sender_id === selected && m.recipient_id === user.id)) {
-        setMessages((prev) => [...prev, m]);
-      }
-    }).subscribe();
+    const ch = supabase.channel(`dm:${selected}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (p) => {
+        const m: any = p.new;
+        if ((m.sender_id === user.id && m.recipient_id === selected) || (m.sender_id === selected && m.recipient_id === user.id)) {
+          setMessages((prev) => [...prev, m]);
+        }
+      })
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "messages" }, (p) => {
+        const m: any = p.old;
+        setMessages((prev) => prev.filter((x) => x.id !== m.id));
+      })
+      .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [user, selected]);
 
