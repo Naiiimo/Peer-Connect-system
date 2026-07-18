@@ -39,6 +39,7 @@ function MyTutors() {
   const [booking, setBooking] = useState<{ tutorId: string; tutorName: string } | null>(null);
   const [topic, setTopic] = useState("");
   const [pickedSlot, setPickedSlot] = useState<Slot | null>(null);
+  const [viewProfile, setViewProfile] = useState<string | null>(null);
 
   const load = async () => {
     if (!user) return;
