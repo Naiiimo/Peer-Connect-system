@@ -150,10 +150,12 @@ function MyTutors() {
           return (
             <div key={r.id} className="card-elevated p-5">
               <div className="flex items-center gap-3">
-                <img src={r.tutor?.photo_url ?? `https://api.dicebear.com/9.x/initials/svg?seed=${r.tutor?.full_name}`} className="h-12 w-12 rounded-full object-cover" alt="" />
+                <button onClick={() => setViewProfile(r.tutor_id)} className="shrink-0">
+                  <img src={r.tutor?.photo_url ?? `https://api.dicebear.com/9.x/initials/svg?seed=${r.tutor?.full_name}`} className="h-12 w-12 rounded-full object-cover ring-2 ring-transparent hover:ring-primary/40" alt="" />
+                </button>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="truncate font-medium">{r.tutor?.full_name}</h3>
+                    <button onClick={() => setViewProfile(r.tutor_id)} className="truncate font-medium hover:underline">{r.tutor?.full_name}</button>
                     <Badge variant={r.status === "accepted" ? "default" : r.status === "pending" ? "secondary" : "destructive"} className="capitalize text-[10px]">{r.status}</Badge>
                   </div>
                   <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
