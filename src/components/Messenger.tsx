@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Trash2 } from "lucide-react";
+import { Send, Trash2, Pencil, Check, CheckCheck, X } from "lucide-react";
 import { toast } from "sonner";
 
 export function Messenger() {
