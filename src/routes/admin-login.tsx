@@ -21,7 +21,7 @@ function AdminLogin() {
     e.preventDefault();
     const lock = checkLockout(email);
     if (lock.locked) {
-      return toast.error(`Too many failed attempts. Please try again in about ${lock.hoursLeft} hour${lock.hoursLeft === 1 ? "" : "s"} (24-hour lockout).`);
+      return toast.error(`Too many failed attempts. Please try again in about ${lock.minutesLeft} minute${lock.minutesLeft === 1 ? "" : "s"}.`);
     }
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -29,9 +29,9 @@ function AdminLogin() {
       setLoading(false);
       const r = recordFailure(email);
       if (r.locked) {
-        return toast.error("Too many failed attempts. Admin sign-in is locked for 24 hours.");
+        return toast.error("Too many failed attempts. Admin sign-in is locked for 2 minutes.");
       }
-      return toast.error(`${error.message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 24-hour lockout.`);
+      return toast.error(`${error.message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.`);
     }
 
     const { data: prof } = await supabase
