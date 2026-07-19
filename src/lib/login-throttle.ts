@@ -21,12 +21,12 @@ function write(store: Store) {
 }
 function keyFor(email: string) { return email.trim().toLowerCase(); }
 
-export function checkLockout(email: string): { locked: boolean; minutesLeft: number } {
+export function checkLockout(email: string): { locked: boolean; msLeft: number; minutesLeft: number; secondsLeft: number } {
   const rec = read()[keyFor(email)];
-  if (!rec?.lockedUntil) return { locked: false, minutesLeft: 0 };
+  if (!rec?.lockedUntil) return { locked: false, msLeft: 0, minutesLeft: 0, secondsLeft: 0 };
   const remaining = rec.lockedUntil - Date.now();
-  if (remaining <= 0) return { locked: false, minutesLeft: 0 };
-  return { locked: true, minutesLeft: Math.max(1, Math.ceil(remaining / (60 * 1000))) };
+  if (remaining <= 0) return { locked: false, msLeft: 0, minutesLeft: 0, secondsLeft: 0 };
+  return { locked: true, msLeft: remaining, minutesLeft: Math.max(1, Math.ceil(remaining / 60000)), secondsLeft: Math.ceil(remaining / 1000) };
 }
 
 export function recordFailure(email: string): { locked: boolean; attemptsLeft: number; minutesLeft: number } {
