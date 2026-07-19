@@ -12,6 +12,8 @@ export function Messenger() {
   const [selected, setSelected] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [body, setBody] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editBody, setEditBody] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
