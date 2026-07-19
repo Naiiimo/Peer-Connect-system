@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,27 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [lockMsLeft, setLockMsLeft] = useState(0);
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
+
+  // Live lockout countdown — re-checks localStorage every second so the timer ticks down.
+  useEffect(() => {
+    const tick = () => {
+      const lock = checkLockout(email);
+      setLockMsLeft(lock.locked ? lock.msLeft : 0);
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [email]);
+
+  const fmtCountdown = (ms: number) => {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    const mm = Math.floor(s / 60);
+    const ss = s % 60;
+    return `${mm}:${ss.toString().padStart(2, "0")}`;
+  };
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,8 +61,10 @@ function SignIn() {
         const isRoleDenied = result.message.includes("not registered as a Student") || result.message.includes("not registered as a Tutor");
         if (isRoleDenied) return toast.error(result.message);
         const r = recordFailure(email);
+        setAttemptsLeft(r.attemptsLeft);
         if (r.locked) {
-          return toast.error("Too many failed attempts. Sign-in is locked for 2 minutes. Please try again shortly.");
+          setLockMsLeft(2 * 60 * 1000);
+          return toast.error("Too many failed attempts. Sign-in is locked for 2 minutes.");
         }
         return toast.error(`${result.message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.`);
       }
@@ -60,8 +83,10 @@ function SignIn() {
       const isRoleDenied = message.includes("not registered as a Student") || message.includes("not registered as a Tutor");
       if (isRoleDenied) return toast.error(message);
       const r = recordFailure(email);
+      setAttemptsLeft(r.attemptsLeft);
       if (r.locked) {
-        return toast.error("Too many failed attempts. Sign-in is locked for 2 minutes. Please try again shortly.");
+        setLockMsLeft(2 * 60 * 1000);
+        return toast.error("Too many failed attempts. Sign-in is locked for 2 minutes.");
       }
       return toast.error(`${message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.`);
     }
@@ -106,7 +131,19 @@ function SignIn() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>{loading ? "Signing in…" : "Sign in"}</Button>
+            {lockMsLeft > 0 && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
+                Locked out. Try again in <span className="font-mono font-semibold">{fmtCountdown(lockMsLeft)}</span>
+              </div>
+            )}
+            {lockMsLeft === 0 && attemptsLeft !== null && attemptsLeft < 5 && (
+              <p className="text-center text-xs text-muted-foreground">
+                {attemptsLeft} attempt{attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.
+              </p>
+            )}
+            <Button type="submit" className="w-full" disabled={loading || lockMsLeft > 0}>
+              {lockMsLeft > 0 ? `Locked (${fmtCountdown(lockMsLeft)})` : loading ? "Signing in…" : "Sign in"}
+            </Button>
 
             <div className="text-center text-xs">
               <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">Forgot password?</Link>
