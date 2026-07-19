@@ -99,35 +99,64 @@ export function Messenger() {
           {!selected && <p className="text-sm text-muted-foreground">Pick a conversation.</p>}
           {messages.map((m) => {
             const mine = m.sender_id === user?.id;
+            const isEditing = editingId === m.id;
+            const doDelete = async () => {
+              if (!confirm("Delete this message?")) return;
+              const { error } = await supabase.from("messages").delete().eq("id", m.id);
+              if (error) return toast.error(error.message);
+              setMessages((prev) => prev.filter((x) => x.id !== m.id));
+            };
+            const startEdit = () => { setEditingId(m.id); setEditBody(m.body); };
+            const saveEdit = async () => {
+              const trimmed = editBody.trim();
+              if (!trimmed) return;
+              const { error } = await supabase.from("messages").update({ body: trimmed, edited_at: new Date().toISOString() }).eq("id", m.id);
+              if (error) return toast.error(error.message);
+              setMessages((prev) => prev.map((x) => (x.id === m.id ? { ...x, body: trimmed, edited_at: new Date().toISOString() } : x)));
+              setEditingId(null);
+            };
             return (
               <div key={m.id} className={`group mb-2 flex items-end gap-1 ${mine ? "justify-end" : ""}`}>
-                {mine && (
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      const { error } = await supabase.from("messages").delete().eq("id", m.id);
-                      if (error) return toast.error(error.message);
-                      setMessages((prev) => prev.filter((x) => x.id !== m.id));
-                    }}
-                    className="opacity-0 transition group-hover:opacity-100"
-                    aria-label="Delete message"
-                    title="Delete message"
-                  >
-                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                  </button>
+                {mine && !isEditing && (
+                  <div className="flex flex-col gap-1 opacity-0 transition group-hover:opacity-100">
+                    <button type="button" onClick={startEdit} aria-label="Edit message" title="Edit message">
+                      <Pencil className="h-3.5 w-3.5 text-muted-foreground hover:text-primary" />
+                    </button>
+                    <button type="button" onClick={doDelete} aria-label="Delete message" title="Delete message">
+                      <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                    </button>
+                  </div>
                 )}
                 <div className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${mine ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
-                  {m.body}
-                  <div className="mt-0.5 text-[9px] opacity-70">{new Date(m.created_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" })}</div>
+                  {isEditing ? (
+                    <div className="flex items-center gap-1">
+                      <Input
+                        value={editBody}
+                        onChange={(e) => setEditBody(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); saveEdit(); } if (e.key === "Escape") setEditingId(null); }}
+                        autoFocus
+                        className="h-7 min-w-[160px] bg-background text-foreground"
+                      />
+                      <button type="button" onClick={saveEdit} aria-label="Save"><Check className="h-4 w-4" /></button>
+                      <button type="button" onClick={() => setEditingId(null)} aria-label="Cancel"><X className="h-4 w-4" /></button>
+                    </div>
+                  ) : (
+                    <>{m.body}</>
+                  )}
+                  <div className="mt-0.5 flex items-center gap-1 text-[9px] opacity-70">
+                    <span>{new Date(m.created_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" })}</span>
+                    {m.edited_at && <span>· edited</span>}
+                    {mine && (
+                      m.read_at
+                        ? <span className="ml-1 inline-flex items-center gap-0.5" title={`Read ${new Date(m.read_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" })}`}><CheckCheck className="h-3 w-3" /> Read</span>
+                        : <span className="ml-1 inline-flex items-center gap-0.5" title="Sent"><Check className="h-3 w-3" /> Sent</span>
+                    )}
+                  </div>
                 </div>
-                {!mine && (
+                {!mine && !isEditing && (
                   <button
                     type="button"
-                    onClick={async () => {
-                      const { error } = await supabase.from("messages").delete().eq("id", m.id);
-                      if (error) return toast.error(error.message);
-                      setMessages((prev) => prev.filter((x) => x.id !== m.id));
-                    }}
+                    onClick={doDelete}
                     className="opacity-0 transition group-hover:opacity-100"
                     aria-label="Delete message"
                     title="Delete message"
