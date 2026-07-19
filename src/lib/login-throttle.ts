@@ -2,7 +2,7 @@
 // Blocks further sign-in attempts for the same email for 24h after MAX failures.
 
 const MAX_ATTEMPTS = 5;
-const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
+const WINDOW_MS = 2 * 60 * 1000; // 2 minutes
 const KEY = "pc:login-attempts";
 
 type Attempt = { count: number; firstAt: number; lockedUntil?: number };
