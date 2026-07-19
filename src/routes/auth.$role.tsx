@@ -131,7 +131,19 @@ function SignIn() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>{loading ? "Signing in…" : "Sign in"}</Button>
+            {lockMsLeft > 0 && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
+                Locked out. Try again in <span className="font-mono font-semibold">{fmtCountdown(lockMsLeft)}</span>
+              </div>
+            )}
+            {lockMsLeft === 0 && attemptsLeft !== null && attemptsLeft < 5 && (
+              <p className="text-center text-xs text-muted-foreground">
+                {attemptsLeft} attempt{attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.
+              </p>
+            )}
+            <Button type="submit" className="w-full" disabled={loading || lockMsLeft > 0}>
+              {lockMsLeft > 0 ? `Locked (${fmtCountdown(lockMsLeft)})` : loading ? "Signing in…" : "Sign in"}
+            </Button>
 
             <div className="text-center text-xs">
               <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">Forgot password?</Link>
