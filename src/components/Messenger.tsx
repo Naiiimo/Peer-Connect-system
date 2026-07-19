@@ -50,6 +50,12 @@ export function Messenger() {
         const m: any = p.old;
         setMessages((prev) => prev.filter((x) => x.id !== m.id));
       })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages" }, (p) => {
+        const m: any = p.new;
+        if ((m.sender_id === user.id && m.recipient_id === selected) || (m.sender_id === selected && m.recipient_id === user.id)) {
+          setMessages((prev) => prev.map((x) => (x.id === m.id ? m : x)));
+        }
+      })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [user, selected]);
