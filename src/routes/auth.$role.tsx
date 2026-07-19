@@ -30,7 +30,7 @@ function SignIn() {
     e.preventDefault();
     const lock = checkLockout(email);
     if (lock.locked) {
-      return toast.error(`Too many failed attempts. Please try again in about ${lock.hoursLeft} hour${lock.hoursLeft === 1 ? "" : "s"} (24-hour lockout).`);
+      return toast.error(`Too many failed attempts. Please try again in about ${lock.minutesLeft} minute${lock.minutesLeft === 1 ? "" : "s"}.`);
     }
     setLoading(true);
     try {
@@ -41,9 +41,9 @@ function SignIn() {
         if (isRoleDenied) return toast.error(result.message);
         const r = recordFailure(email);
         if (r.locked) {
-          return toast.error("Too many failed attempts. Your account sign-in is locked for 24 hours. Please try again tomorrow.");
+          return toast.error("Too many failed attempts. Sign-in is locked for 2 minutes. Please try again shortly.");
         }
-        return toast.error(`${result.message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 24-hour lockout.`);
+        return toast.error(`${result.message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.`);
       }
       const { error: sessionError } = await supabase.auth.setSession({
         access_token: result.session.access_token,
@@ -61,9 +61,9 @@ function SignIn() {
       if (isRoleDenied) return toast.error(message);
       const r = recordFailure(email);
       if (r.locked) {
-        return toast.error("Too many failed attempts. Your account sign-in is locked for 24 hours. Please try again tomorrow.");
+        return toast.error("Too many failed attempts. Sign-in is locked for 2 minutes. Please try again shortly.");
       }
-      return toast.error(`${message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 24-hour lockout.`);
+      return toast.error(`${message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.`);
     }
   };
 

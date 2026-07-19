@@ -1,5 +1,5 @@
 // Client-side login throttle. Not a security boundary — just a UX guard.
-// Blocks further sign-in attempts for the same email for 24h after MAX failures.
+// Blocks further sign-in attempts for the same email for 2 minutes after MAX failures.
 
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 2 * 60 * 1000; // 2 minutes
@@ -21,15 +21,15 @@ function write(store: Store) {
 }
 function keyFor(email: string) { return email.trim().toLowerCase(); }
 
-export function checkLockout(email: string): { locked: boolean; hoursLeft: number } {
+export function checkLockout(email: string): { locked: boolean; minutesLeft: number } {
   const rec = read()[keyFor(email)];
-  if (!rec?.lockedUntil) return { locked: false, hoursLeft: 0 };
+  if (!rec?.lockedUntil) return { locked: false, minutesLeft: 0 };
   const remaining = rec.lockedUntil - Date.now();
-  if (remaining <= 0) return { locked: false, hoursLeft: 0 };
-  return { locked: true, hoursLeft: Math.ceil(remaining / (60 * 60 * 1000)) };
+  if (remaining <= 0) return { locked: false, minutesLeft: 0 };
+  return { locked: true, minutesLeft: Math.max(1, Math.ceil(remaining / (60 * 1000))) };
 }
 
-export function recordFailure(email: string): { locked: boolean; attemptsLeft: number; hoursLeft: number } {
+export function recordFailure(email: string): { locked: boolean; attemptsLeft: number; minutesLeft: number } {
   const store = read();
   const k = keyFor(email);
   const now = Date.now();
@@ -46,7 +46,7 @@ export function recordFailure(email: string): { locked: boolean; attemptsLeft: n
   return {
     locked: !!rec.lockedUntil,
     attemptsLeft: Math.max(0, MAX_ATTEMPTS - rec.count),
-    hoursLeft: rec.lockedUntil ? 24 : 0,
+    minutesLeft: rec.lockedUntil ? 2 : 0,
   };
 }
 
