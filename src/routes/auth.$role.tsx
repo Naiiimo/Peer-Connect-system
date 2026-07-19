@@ -61,8 +61,10 @@ function SignIn() {
         const isRoleDenied = result.message.includes("not registered as a Student") || result.message.includes("not registered as a Tutor");
         if (isRoleDenied) return toast.error(result.message);
         const r = recordFailure(email);
+        setAttemptsLeft(r.attemptsLeft);
         if (r.locked) {
-          return toast.error("Too many failed attempts. Sign-in is locked for 2 minutes. Please try again shortly.");
+          setLockMsLeft(2 * 60 * 1000);
+          return toast.error("Too many failed attempts. Sign-in is locked for 2 minutes.");
         }
         return toast.error(`${result.message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.`);
       }
