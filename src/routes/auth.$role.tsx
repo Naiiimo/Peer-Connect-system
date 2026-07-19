@@ -25,6 +25,27 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [lockMsLeft, setLockMsLeft] = useState(0);
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
+
+  // Live lockout countdown — re-checks localStorage every second so the timer ticks down.
+  useEffect(() => {
+    const tick = () => {
+      const lock = checkLockout(email);
+      setLockMsLeft(lock.locked ? lock.msLeft : 0);
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [email]);
+
+  const fmtCountdown = (ms: number) => {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    const mm = Math.floor(s / 60);
+    const ss = s % 60;
+    return `${mm}:${ss.toString().padStart(2, "0")}`;
+  };
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
