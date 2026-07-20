@@ -10,8 +10,10 @@ import { TopBar } from "@/components/TopBar";
 import { toast } from "sonner";
 import { SCHOOLS, YEARS, LEARNING_STYLES, GENDERS } from "@/lib/schools";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, ArrowLeft } from "lucide-react";
+import { Camera, ArrowLeft, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { loadCourses, type Course } from "@/lib/curriculum";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/register/$role")({
   component: Register,
