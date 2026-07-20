@@ -239,6 +239,44 @@ function Register() {
                   })}
                 </div>
               </div>
+              <div>
+                <Label>Courses you can teach</Label>
+                <p className="mt-1 text-xs text-muted-foreground">Pick from the USIU catalogue — filtered by the schools you selected above.</p>
+                {tutorCourses.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {tutorCourses.map((code) => {
+                      const c = allCourses.find((x) => x.code === code);
+                      return (
+                        <Badge key={code} variant="secondary" className="gap-1.5 pr-1">
+                          {code}{c ? ` · ${c.title}` : ""}
+                          <button type="button" aria-label={`Remove ${code}`} onClick={() => setTutorCourses((prev) => prev.filter((x) => x !== code))} className="rounded-sm hover:bg-background/60">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+                <Input value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} placeholder="Search by code or title (e.g. SWE, Calculus)…" className="mt-2" />
+                <div className="mt-2 grid max-h-56 gap-1 overflow-y-auto rounded-md border border-border p-2 md:grid-cols-2">
+                  {(() => {
+                    const pool = tutorSchools.length ? allCourses.filter((c) => tutorSchools.includes(c.school)) : allCourses;
+                    const lc = courseFilter.trim().toLowerCase();
+                    const list = lc ? pool.filter((c) => c.code.toLowerCase().includes(lc) || c.title.toLowerCase().includes(lc)) : pool;
+                    if (allCourses.length === 0) return <p className="text-sm text-muted-foreground">Loading catalogue…</p>;
+                    if (list.length === 0) return <p className="text-sm text-muted-foreground">No matching courses.</p>;
+                    return list.map((c) => {
+                      const checked = tutorCourses.includes(c.code);
+                      return (
+                        <label key={c.code} className="flex items-start gap-2 rounded px-1.5 py-1 text-sm hover:bg-secondary/50">
+                          <Checkbox checked={checked} onCheckedChange={(v) => setTutorCourses((prev) => v ? [...prev, c.code] : prev.filter((x) => x !== c.code))} />
+                          <span><span className="font-medium">{c.code}</span> — {c.title}</span>
+                        </label>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
               <Field label="Specialized topics (comma separated)">
                 <Input value={specializations} onChange={(e) => setSpecializations(e.target.value)} placeholder="e.g. Calculus, Data Structures, Marketing Analytics" />
               </Field>
