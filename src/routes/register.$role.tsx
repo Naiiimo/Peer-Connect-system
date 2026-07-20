@@ -124,6 +124,10 @@ function Register() {
       await new Promise((r) => setTimeout(r, 400));
     }
 
+    if (role === "tutor" && tutorCourses.length > 0) {
+      await supabase.from("tutor_courses").insert(tutorCourses.map((c) => ({ tutor_id: uid, course_code: c })));
+    }
+
     setLoading(false);
     toast.success("Account created!");
     navigate({ to: role === "tutor" ? "/tutor" : "/student" });
