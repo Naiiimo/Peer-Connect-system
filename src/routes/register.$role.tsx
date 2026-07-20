@@ -52,6 +52,11 @@ function Register() {
   const [tutorSchools, setTutorSchools] = useState<string[]>([]);
   const [tutorProgrammes, setTutorProgrammes] = useState<string[]>([]);
   const [specializations, setSpecializations] = useState<string>("");
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [tutorCourses, setTutorCourses] = useState<string[]>([]);
+  const [courseFilter, setCourseFilter] = useState("");
+
+  useEffect(() => { if (role === "tutor") loadCourses().then(setAllCourses); }, [role]);
 
   const [loading, setLoading] = useState(false);
 
