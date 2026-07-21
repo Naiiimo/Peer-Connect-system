@@ -114,7 +114,7 @@ function FindTutors() {
       </form>
       <div className="mb-6 flex items-center gap-2">
         <div className="flex-1 sm:max-w-xs">
-          <CourseSelect programmeCode={profile?.programme_code ?? null} value={courseFilter} onChange={setCourseFilter} placeholder="Filter by course" />
+          <CourseSelect programmeCode={programmeCode} value={courseFilter} onChange={setCourseFilter} placeholder="Filter by course" />
         </div>
         {courseFilter && (
           <Button type="button" size="sm" variant="ghost" onClick={() => setCourseFilter("")}>
