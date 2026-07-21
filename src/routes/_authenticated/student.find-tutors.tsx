@@ -18,7 +18,8 @@ function FindTutors() {
   const [viewProfile, setViewProfile] = useState<string | null>(null);
   const { user, profile } = useAuth();
   const [q, setQ] = useState("");
-  const [courseFilter, setCourseFilter] = useState<string>("");
+  const [courseFilters, setCourseFilters] = useState<string[]>([]);
+  const [pickingCourse, setPickingCourse] = useState("");
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [tutors, setTutors] = useState<any[]>([]);
   const [tutorCourseMap, setTutorCourseMap] = useState<Record<string, string[]>>({});
@@ -42,7 +43,6 @@ function FindTutors() {
     const { data } = await query.limit(50);
     let list = data ?? [];
 
-    // Load tutor_courses for these tutors
     const ids = list.map((t: any) => t.id);
     const courseMap: Record<string, string[]> = {};
     if (ids.length) {
@@ -53,8 +53,11 @@ function FindTutors() {
     }
     setTutorCourseMap(courseMap);
 
-    if (courseFilter) {
-      list = list.filter((t: any) => (courseMap[t.id] ?? []).includes(courseFilter));
+    if (courseFilters.length) {
+      list = list.filter((t: any) => {
+        const codes = courseMap[t.id] ?? [];
+        return courseFilters.every((cf) => codes.includes(cf));
+      });
     }
     if (q.trim()) {
       const lc = q.toLowerCase();
@@ -66,7 +69,15 @@ function FindTutors() {
         (courseMap[t.id] ?? []).some((c: string) => c.toLowerCase().includes(lc))
       );
     }
-    list.sort((a: any, b: any) => Number(b.avg_rating ?? 0) - Number(a.avg_rating ?? 0));
+    // Merge sort: match-count desc, then rating desc, then name asc
+    list.sort((a: any, b: any) => {
+      const am = courseFilters.length ? courseFilters.filter((c) => (courseMap[a.id] ?? []).includes(c)).length : 0;
+      const bm = courseFilters.length ? courseFilters.filter((c) => (courseMap[b.id] ?? []).includes(c)).length : 0;
+      if (bm !== am) return bm - am;
+      const ar = Number(a.avg_rating ?? 0), br = Number(b.avg_rating ?? 0);
+      if (br !== ar) return br - ar;
+      return (a.full_name ?? "").localeCompare(b.full_name ?? "");
+    });
     setTutors(list);
     setLoading(false);
 
@@ -76,9 +87,17 @@ function FindTutors() {
     }
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [profile?.programme, courseFilter]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [profile?.programme, courseFilters.join(",")]);
 
   const codeToTitle = Object.fromEntries(allCourses.map((c) => [c.code, c.title]));
+
+  const addCourseFilter = (code: string) => {
+    if (!code) return;
+    if (courseFilters.includes(code)) { toast.error("Course already in filter"); setPickingCourse(""); return; }
+    setCourseFilters((f) => [...f, code]);
+    setPickingCourse("");
+  };
+  const removeCourseFilter = (code: string) => setCourseFilters((f) => f.filter((c) => c !== code));
 
   const request = async (tutorId: string) => {
     if (!user) return;
@@ -112,16 +131,30 @@ function FindTutors() {
         </div>
         <Button type="submit" disabled={loading}>{loading ? "…" : "Search"}</Button>
       </form>
-      <div className="mb-6 flex items-center gap-2">
+      <div className="mb-3 flex items-center gap-2">
         <div className="flex-1 sm:max-w-xs">
-          <CourseSelect programmeCode={programmeCode} value={courseFilter} onChange={setCourseFilter} placeholder="Filter by course" />
+          <CourseSelect programmeCode={programmeCode} value={pickingCourse} onChange={addCourseFilter} exclude={courseFilters} placeholder="Add course filter" />
         </div>
-        {courseFilter && (
-          <Button type="button" size="sm" variant="ghost" onClick={() => setCourseFilter("")}>
-            <X className="mr-1 h-3 w-3" /> Clear
+        {courseFilters.length > 0 && (
+          <Button type="button" size="sm" variant="ghost" onClick={() => setCourseFilters([])}>
+            <X className="mr-1 h-3 w-3" /> Clear all
           </Button>
         )}
       </div>
+      {courseFilters.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          {courseFilters.map((code) => (
+            <Badge key={code} variant="secondary" className="gap-1.5 pr-1" title={codeToTitle[code]}>
+              {code}{codeToTitle[code] ? ` · ${codeToTitle[code]}` : ""}
+              <button aria-label={`Remove ${code}`} onClick={() => removeCourseFilter(code)} className="rounded-sm hover:bg-background/60">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+
+
 
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -149,9 +182,12 @@ function FindTutors() {
                 </div>
                 <p className="line-clamp-2 text-xs text-muted-foreground">{t.bio || (t.specializations ?? []).join(", ") || "USIU tutor"}</p>
                 <div className="mt-2 flex flex-wrap gap-1">
-                  {(tutorCourseMap[t.id] ?? []).slice(0,4).map((code: string) => (
-                    <Badge key={code} variant="outline" className="text-[10px]" title={codeToTitle[code]}>{code}</Badge>
+                  {(tutorCourseMap[t.id] ?? []).slice(0,6).map((code: string) => (
+                    <Badge key={code} variant="outline" className="text-[10px]" title={codeToTitle[code]}>
+                      {code}{codeToTitle[code] ? ` · ${codeToTitle[code]}` : ""}
+                    </Badge>
                   ))}
+
                   {(t.specializations ?? []).slice(0,2).map((s: string) => <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>)}
                 </div>
                 <div className="mt-3 flex gap-2">
