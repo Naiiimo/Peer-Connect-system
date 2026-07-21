@@ -243,8 +243,8 @@ function ResearchPage() {
               )}
 
               {summaries[p.id] && (
-                <div className="mt-4 rounded-md border border-primary/20 bg-primary/5 p-4">
-                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                <div className="mt-4 rounded-md border border-mint bg-mint/30 p-4">
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                     <Sparkles className="h-3.5 w-3.5" /> AI summary
                   </div>
                   <div className="prose prose-sm max-w-none whitespace-pre-wrap text-sm text-foreground">
