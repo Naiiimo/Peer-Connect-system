@@ -30,11 +30,15 @@ export function MyCourses({ role, programmeCode }: { role: Role; programmeCode: 
 
   const add = async () => {
     if (!user || !picking) return;
+    if (mine.includes(picking)) return toast.error("You already added this course.");
     const { error } =
       role === "tutor"
         ? await supabase.from("tutor_courses").insert({ tutor_id: user.id, course_code: picking })
         : await supabase.from("student_courses").insert({ student_id: user.id, course_code: picking });
-    if (error) return toast.error(error.message);
+    if (error) {
+      if ((error as any).code === "23505") return toast.error("You already added this course.");
+      return toast.error(error.message);
+    }
     setPicking(""); load();
   };
   const remove = async (code: string) => {
