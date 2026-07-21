@@ -149,7 +149,10 @@ function FindTutors() {
                 </div>
                 <p className="line-clamp-2 text-xs text-muted-foreground">{t.bio || (t.specializations ?? []).join(", ") || "USIU tutor"}</p>
                 <div className="mt-2 flex flex-wrap gap-1">
-                  {(t.specializations ?? []).slice(0,3).map((s: string) => <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>)}
+                  {(tutorCourseMap[t.id] ?? []).slice(0,4).map((code: string) => (
+                    <Badge key={code} variant="outline" className="text-[10px]" title={codeToTitle[code]}>{code}</Badge>
+                  ))}
+                  {(t.specializations ?? []).slice(0,2).map((s: string) => <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>)}
                 </div>
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => setViewProfile(t.id)}>View profile</Button>
