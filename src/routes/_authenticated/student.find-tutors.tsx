@@ -5,10 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Star, Search, Send } from "lucide-react";
+import { Star, Search, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { ProfileDialog } from "@/components/ProfileDialog";
+import { CourseSelect } from "@/components/AcademicSelectors";
+import { loadCourses, type Course } from "@/lib/curriculum";
 
 export const Route = createFileRoute("/_authenticated/student/find-tutors")({ component: FindTutors });
 
@@ -16,9 +18,14 @@ function FindTutors() {
   const [viewProfile, setViewProfile] = useState<string | null>(null);
   const { user, profile } = useAuth();
   const [q, setQ] = useState("");
+  const [courseFilter, setCourseFilter] = useState<string>("");
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [tutors, setTutors] = useState<any[]>([]);
+  const [tutorCourseMap, setTutorCourseMap] = useState<Record<string, string[]>>({});
   const [conns, setConns] = useState<Record<string, { id: string; status: string; updated_at: string }>>({});
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => { loadCourses().then(setAllCourses); }, []);
 
   const load = async () => {
     setLoading(true);
@@ -29,13 +36,29 @@ function FindTutors() {
     if (profile?.programme) query = query.contains("tutor_programmes", [profile.programme]);
     const { data } = await query.limit(50);
     let list = data ?? [];
+
+    // Load tutor_courses for these tutors
+    const ids = list.map((t: any) => t.id);
+    const courseMap: Record<string, string[]> = {};
+    if (ids.length) {
+      const { data: tc } = await supabase.from("tutor_courses").select("tutor_id,course_code").in("tutor_id", ids);
+      (tc ?? []).forEach((r: any) => {
+        (courseMap[r.tutor_id] ??= []).push(r.course_code);
+      });
+    }
+    setTutorCourseMap(courseMap);
+
+    if (courseFilter) {
+      list = list.filter((t: any) => (courseMap[t.id] ?? []).includes(courseFilter));
+    }
     if (q.trim()) {
       const lc = q.toLowerCase();
       list = list.filter((t: any) =>
         (t.full_name ?? "").toLowerCase().includes(lc) ||
         (t.email ?? "").toLowerCase().includes(lc) ||
         (t.specializations ?? []).some((s: string) => s.toLowerCase().includes(lc)) ||
-        (t.tutor_programmes ?? []).some((s: string) => s.toLowerCase().includes(lc))
+        (t.tutor_programmes ?? []).some((s: string) => s.toLowerCase().includes(lc)) ||
+        (courseMap[t.id] ?? []).some((c: string) => c.toLowerCase().includes(lc))
       );
     }
     list.sort((a: any, b: any) => Number(b.avg_rating ?? 0) - Number(a.avg_rating ?? 0));
@@ -48,7 +71,9 @@ function FindTutors() {
     }
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [profile?.programme]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [profile?.programme, courseFilter]);
+
+  const codeToTitle = Object.fromEntries(allCourses.map((c) => [c.code, c.title]));
 
   const request = async (tutorId: string) => {
     if (!user) return;
