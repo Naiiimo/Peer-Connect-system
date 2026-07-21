@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { ProfileDialog } from "@/components/ProfileDialog";
 import { CourseSelect } from "@/components/AcademicSelectors";
-import { loadCourses, type Course } from "@/lib/curriculum";
+import { loadCourses, loadProgrammes, type Course } from "@/lib/curriculum";
 
 export const Route = createFileRoute("/_authenticated/student/find-tutors")({ component: FindTutors });
 
