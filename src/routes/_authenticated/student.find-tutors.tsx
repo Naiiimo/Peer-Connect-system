@@ -24,8 +24,13 @@ function FindTutors() {
   const [tutorCourseMap, setTutorCourseMap] = useState<Record<string, string[]>>({});
   const [conns, setConns] = useState<Record<string, { id: string; status: string; updated_at: string }>>({});
   const [loading, setLoading] = useState(false);
+  const [programmeCode, setProgrammeCode] = useState<string | null>(null);
 
   useEffect(() => { loadCourses().then(setAllCourses); }, []);
+  useEffect(() => {
+    if (!profile?.programme) { setProgrammeCode(null); return; }
+    loadProgrammes().then((ps) => setProgrammeCode(ps.find((p) => p.name === profile.programme)?.code ?? null));
+  }, [profile?.programme]);
 
   const load = async () => {
     setLoading(true);
