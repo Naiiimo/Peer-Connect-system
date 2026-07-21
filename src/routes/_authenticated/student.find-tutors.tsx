@@ -100,13 +100,24 @@ function FindTutors() {
   return (
     <div>
       <PageHeader title="Find a tutor" description="Search by course, name or email — matched to your programme." />
-      <form onSubmit={(e) => { e.preventDefault(); load(); }} className="mb-6 flex gap-2">
+      <form onSubmit={(e) => { e.preventDefault(); load(); }} className="mb-4 flex flex-col gap-2 sm:flex-row">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search a course, tutor name or email…" className="pl-9" />
         </div>
         <Button type="submit" disabled={loading}>{loading ? "…" : "Search"}</Button>
       </form>
+      <div className="mb-6 flex items-center gap-2">
+        <div className="flex-1 sm:max-w-xs">
+          <CourseSelect programmeCode={profile?.programme_code ?? null} value={courseFilter} onChange={setCourseFilter} placeholder="Filter by course" />
+        </div>
+        {courseFilter && (
+          <Button type="button" size="sm" variant="ghost" onClick={() => setCourseFilter("")}>
+            <X className="mr-1 h-3 w-3" /> Clear
+          </Button>
+        )}
+      </div>
+
 
       <div className="grid gap-4 md:grid-cols-2">
         {tutors.length === 0 && <p className="text-sm text-muted-foreground">No tutors found for your programme yet.</p>}
