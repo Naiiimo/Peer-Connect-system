@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/AppShell";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Calendar, MessageSquare, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -108,7 +108,6 @@ function MyTutors() {
     // eslint-disable-next-line
   }, [user, booking]);
 
-  const bookableTutor = useMemo(() => rows.find((r) => r.tutor_id === booking?.tutorId), [rows, booking]);
   const bookableSlots = booking ? (avail[booking.tutorId] ?? []) : [];
 
   const confirmBook = async () => {
@@ -218,7 +217,10 @@ function MyTutors() {
 
       <Dialog open={!!booking} onOpenChange={(o) => { if (!o) { setBooking(null); setPickedSlot(null); setTopic(""); } }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Book a session with {booking?.tutorName}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Book a session with {booking?.tutorName}</DialogTitle>
+            <DialogDescription>Choose one of the tutor's open slots; it will appear on your schedule after booking.</DialogDescription>
+          </DialogHeader>
           <div className="space-y-3">
             <div><Label>Topic</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g. Calculus II revision" /></div>
             <div>
