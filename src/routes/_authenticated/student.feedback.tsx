@@ -23,7 +23,7 @@ function Feedback() {
       const { data: ts } = tutorIds.length
         ? await supabase.from("profiles").select("id,full_name,photo_url,avg_rating").in("id", tutorIds)
         : { data: [] as any[] };
-      setTutors(ts);
+      setTutors(ts ?? []);
       const { data: revs } = await supabase.from("reviews").select("*").eq("student_id", user.id);
       const map: any = {};
       (revs ?? []).forEach((r: any) => { map[r.tutor_id] = { rating: r.rating, comment: r.comment ?? "" }; });
