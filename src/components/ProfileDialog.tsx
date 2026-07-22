@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 
+type CourseDetail = { code: string; title: string };
+
 export function ProfileDialog({ userId, open, onOpenChange }: { userId: string | null; open: boolean; onOpenChange: (o: boolean) => void }) {
   const [p, setP] = useState<any | null>(null);
-  const [courses, setCourses] = useState<string[]>([]);
+  const [courses, setCourses] = useState<CourseDetail[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -18,10 +20,16 @@ export function ProfileDialog({ userId, open, onOpenChange }: { userId: string |
       const isTutor = (prof?.tutor_programmes ?? []).length > 0 || prof?.role === "tutor";
       if (isTutor) {
         const { data: tc } = await supabase.from("tutor_courses").select("course_code").eq("tutor_id", userId);
-        setCourses((tc ?? []).map((c: any) => c.course_code));
+        const codes = (tc ?? []).map((c: any) => c.course_code);
+        const { data: details } = codes.length ? await supabase.from("courses").select("code,title").in("code", codes) : { data: [] as any[] };
+        const titleMap = Object.fromEntries((details ?? []).map((c: any) => [c.code, c.title]));
+        setCourses(codes.map((code: string) => ({ code, title: titleMap[code] ?? code })));
       } else {
         const { data: sc } = await supabase.from("student_courses").select("course_code").eq("student_id", userId);
-        setCourses((sc ?? []).map((c: any) => c.course_code));
+        const codes = (sc ?? []).map((c: any) => c.course_code);
+        const { data: details } = codes.length ? await supabase.from("courses").select("code,title").in("code", codes) : { data: [] as any[] };
+        const titleMap = Object.fromEntries((details ?? []).map((c: any) => [c.code, c.title]));
+        setCourses(codes.map((code: string) => ({ code, title: titleMap[code] ?? code })));
       }
       setLoading(false);
     })();
@@ -30,7 +38,10 @@ export function ProfileDialog({ userId, open, onOpenChange }: { userId: string |
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
-        <DialogHeader><DialogTitle>Profile</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Profile</DialogTitle>
+          <DialogDescription>Full profile details and courses.</DialogDescription>
+        </DialogHeader>
         {loading || !p ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : (
@@ -73,14 +84,11 @@ export function ProfileDialog({ userId, open, onOpenChange }: { userId: string |
             {(p.tutor_programmes ?? []).length > 0 && (
               <ListRow label="Tutors in programmes" items={p.tutor_programmes} />
             )}
-            {(p.specializations ?? []).length > 0 && (
-              <ListRow label="Specializations" items={p.specializations} />
-            )}
             {(p.languages ?? []).length > 0 && (
               <ListRow label="Languages" items={p.languages} />
             )}
             {courses.length > 0 && (
-              <ListRow label={p.role === "tutor" ? "Courses taught" : "Courses needed"} items={courses} />
+              <CourseList label={p.role === "tutor" ? "Courses taught" : "Courses needed"} items={courses} />
             )}
           </div>
         )}
@@ -104,6 +112,17 @@ function ListRow({ label, items }: { label: string; items: string[] }) {
       <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-1 flex flex-wrap gap-1.5">
         {items.map((s) => <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>)}
+      </div>
+    </div>
+  );
+}
+
+function CourseList({ label, items }: { label: string; items: CourseDetail[] }) {
+  return (
+    <div>
+      <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="mt-1 flex flex-wrap gap-1.5">
+        {items.map((c) => <Badge key={c.code} variant="secondary" className="text-[10px]">{c.code} · {c.title}</Badge>)}
       </div>
     </div>
   );

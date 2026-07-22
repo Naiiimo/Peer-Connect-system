@@ -18,10 +18,13 @@ function Sessions() {
     if (!user) return;
     const { data } = await supabase
       .from("sessions")
-      .select("*, student:profiles!sessions_student_id_fkey(full_name,photo_url)")
+      .select("*")
       .eq("tutor_id", user.id)
       .order("start_at", { ascending: true });
-    setRows(data ?? []);
+    const studentIds = Array.from(new Set((data ?? []).map((s: any) => s.student_id).filter(Boolean)));
+    const { data: students } = studentIds.length ? await supabase.from("profiles").select("id,full_name,photo_url").in("id", studentIds) : { data: [] as any[] };
+    const studentMap = Object.fromEntries((students ?? []).map((s: any) => [s.id, s]));
+    setRows((data ?? []).map((s: any) => ({ ...s, student: studentMap[s.student_id] })));
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [user]);

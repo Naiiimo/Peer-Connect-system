@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Video } from "lucide-react";
 import { toast } from "sonner";
 
@@ -22,8 +22,12 @@ function Schedule() {
 
   const load = async () => {
     if (!user) return;
-    const { data } = await supabase.from("sessions").select("*, tutor:profiles!sessions_tutor_id_fkey(full_name)").eq("student_id", user.id).order("start_at");
-    setSessions(data ?? []);
+    const { data, error } = await supabase.from("sessions").select("*").eq("student_id", user.id).order("start_at");
+    if (error) return toast.error(error.message);
+    const tutorIds = Array.from(new Set((data ?? []).map((s: any) => s.tutor_id).filter((id: string) => id && id !== user.id)));
+    const { data: tutors } = tutorIds.length ? await supabase.from("profiles").select("id,full_name").in("id", tutorIds) : { data: [] as any[] };
+    const tutorMap = Object.fromEntries((tutors ?? []).map((t: any) => [t.id, t]));
+    setSessions((data ?? []).map((s: any) => ({ ...s, tutor: tutorMap[s.tutor_id] })));
   };
   useEffect(() => { load(); }, [user]);
 
@@ -51,7 +55,10 @@ function Schedule() {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button size="sm"><Plus className="mr-1 h-4 w-4" /> Add</Button></DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>New event</DialogTitle></DialogHeader>
+            <DialogHeader>
+              <DialogTitle>New event</DialogTitle>
+              <DialogDescription>Add a personal study event to your schedule.</DialogDescription>
+            </DialogHeader>
             <div className="space-y-3">
               <div><Label>Topic</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} /></div>
               <div className="grid grid-cols-2 gap-3">
