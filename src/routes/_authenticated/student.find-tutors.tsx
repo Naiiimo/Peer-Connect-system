@@ -37,7 +37,7 @@ function FindTutors() {
     setLoading(true);
     let query = supabase
       .from("profiles")
-      .select("id,full_name,email,photo_url,avg_rating,tutor_programmes,specializations,bio")
+      .select("id,full_name,email,photo_url,avg_rating,tutor_programmes,bio")
       .not("tutor_programmes", "eq", "{}");
     if (profile?.programme) query = query.contains("tutor_programmes", [profile.programme]);
     const { data } = await query.limit(50);
@@ -64,9 +64,8 @@ function FindTutors() {
       list = list.filter((t: any) =>
         (t.full_name ?? "").toLowerCase().includes(lc) ||
         (t.email ?? "").toLowerCase().includes(lc) ||
-        (t.specializations ?? []).some((s: string) => s.toLowerCase().includes(lc)) ||
         (t.tutor_programmes ?? []).some((s: string) => s.toLowerCase().includes(lc)) ||
-        (courseMap[t.id] ?? []).some((c: string) => c.toLowerCase().includes(lc))
+        (courseMap[t.id] ?? []).some((c: string) => c.toLowerCase().includes(lc) || (codeToTitle[c] ?? "").toLowerCase().includes(lc))
       );
     }
     // Merge sort: match-count desc, then rating desc, then name asc
@@ -180,15 +179,13 @@ function FindTutors() {
                   <button onClick={() => setViewProfile(t.id)} className="truncate font-medium hover:underline">{t.full_name ?? "Tutor"}</button>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground"><Star className="h-3 w-3 fill-accent text-accent" />{Number(t.avg_rating ?? 0).toFixed(1)}</span>
                 </div>
-                <p className="line-clamp-2 text-xs text-muted-foreground">{t.bio || (t.specializations ?? []).join(", ") || "USIU tutor"}</p>
+                <p className="line-clamp-2 text-xs text-muted-foreground">{t.bio || "USIU tutor"}</p>
                 <div className="mt-2 flex flex-wrap gap-1">
-                  {(tutorCourseMap[t.id] ?? []).slice(0,6).map((code: string) => (
+                  {(tutorCourseMap[t.id] ?? []).map((code: string) => (
                     <Badge key={code} variant="outline" className="text-[10px]" title={codeToTitle[code]}>
                       {code}{codeToTitle[code] ? ` · ${codeToTitle[code]}` : ""}
                     </Badge>
                   ))}
-
-                  {(t.specializations ?? []).slice(0,2).map((s: string) => <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>)}
                 </div>
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => setViewProfile(t.id)}>View profile</Button>

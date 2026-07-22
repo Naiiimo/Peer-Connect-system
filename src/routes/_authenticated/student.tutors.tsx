@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/AppShell";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Calendar, MessageSquare, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -54,7 +54,7 @@ function MyTutors() {
     if (allTutorIds.length) {
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id,full_name,photo_url,school,programme,tutor_schools,tutor_programmes,avg_rating,specializations,languages,bio")
+        .select("id,full_name,photo_url,school,programme,tutor_schools,tutor_programmes,avg_rating,languages,bio")
         .in("id", allTutorIds);
       tutorMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p]));
     }
@@ -108,7 +108,6 @@ function MyTutors() {
     // eslint-disable-next-line
   }, [user, booking]);
 
-  const bookableTutor = useMemo(() => rows.find((r) => r.tutor_id === booking?.tutorId), [rows, booking]);
   const bookableSlots = booking ? (avail[booking.tutorId] ?? []) : [];
 
   const confirmBook = async () => {
@@ -164,7 +163,7 @@ function MyTutors() {
                     <span>{(r.tutor?.tutor_programmes ?? [r.tutor?.programme]).filter(Boolean).slice(0, 2).join(" · ") || "Programme not set"}</span>
                     <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-accent text-accent" />{Number(r.tutor?.avg_rating ?? 0).toFixed(1)}</span>
                   </div>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{r.tutor?.bio || (r.tutor?.specializations ?? []).slice(0,3).join(" · ") || "USIU tutor"}</p>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{r.tutor?.bio || "USIU tutor"}</p>
                   {r.tutor?.languages?.length ? (
                     <p className="mt-0.5 text-[11px] text-muted-foreground">Speaks: {r.tutor.languages.join(", ")}</p>
                   ) : null}
@@ -177,7 +176,7 @@ function MyTutors() {
                     <div className="text-xs font-medium text-muted-foreground">Courses taught</div>
                     <div className="mt-1 flex flex-wrap gap-1.5">
                       {taughtCourses.length === 0 && <span className="text-xs text-muted-foreground">Not listed</span>}
-                      {taughtCourses.slice(0, 6).map((c) => <Badge key={c.code} variant="secondary" className="text-[10px]">{c.code}</Badge>)}
+                      {taughtCourses.map((c) => <Badge key={c.code} variant="secondary" className="text-[10px]">{c.code} · {c.title}</Badge>)}
                     </div>
                   </div>
                   <div>
@@ -218,7 +217,10 @@ function MyTutors() {
 
       <Dialog open={!!booking} onOpenChange={(o) => { if (!o) { setBooking(null); setPickedSlot(null); setTopic(""); } }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Book a session with {booking?.tutorName}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Book a session with {booking?.tutorName}</DialogTitle>
+            <DialogDescription>Choose one of the tutor's open slots; it will appear on your schedule after booking.</DialogDescription>
+          </DialogHeader>
           <div className="space-y-3">
             <div><Label>Topic</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g. Calculus II revision" /></div>
             <div>

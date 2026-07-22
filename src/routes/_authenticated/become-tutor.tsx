@@ -8,10 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GraduationCap, ArrowLeft, ShieldCheck } from "lucide-react";
+import { GraduationCap, ArrowLeft, ShieldCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { SCHOOLS } from "@/lib/schools";
 import { LanguagePicker } from "@/components/LanguagePicker";
+import { Badge } from "@/components/ui/badge";
+import { loadCourses, type Course } from "@/lib/curriculum";
 
 export const Route = createFileRoute("/_authenticated/become-tutor")({ component: BecomeTutor });
 
@@ -21,13 +23,16 @@ function BecomeTutor() {
   const [programmes, setProgrammes] = useState<{ school: string; name: string }[]>([]);
   const [tutorSchools, setTutorSchools] = useState<string[]>([]);
   const [tutorProgrammes, setTutorProgrammes] = useState<string[]>([]);
-  const [specializations, setSpecializations] = useState("");
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [tutorCourses, setTutorCourses] = useState<string[]>([]);
+  const [courseFilter, setCourseFilter] = useState("");
   const [bio, setBio] = useState(profile?.bio ?? "");
   const [languages, setLanguages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     supabase.from("programmes").select("school,name").then(({ data }) => setProgrammes(data ?? []));
+    loadCourses().then(setAllCourses);
   }, []);
 
   useEffect(() => {
@@ -47,6 +52,7 @@ function BecomeTutor() {
     e.preventDefault();
     if (!user) return;
     if (tutorSchools.length === 0 || tutorProgrammes.length === 0) return toast.error("Pick your schools and programmes.");
+    if (tutorCourses.length === 0) return toast.error("Pick at least one course you can teach.");
     if (!bio.trim()) return toast.error("Add a short bio so students know how you can help.");
 
     setSubmitting(true);
@@ -56,7 +62,7 @@ function BecomeTutor() {
       .update({
         tutor_schools: tutorSchools,
         tutor_programmes: tutorProgrammes,
-        specializations: specializations.split(",").map((t) => t.trim()).filter(Boolean),
+        specializations: [],
         bio,
         ...(languages.length ? { languages } : {}),
       })
@@ -70,6 +76,16 @@ function BecomeTutor() {
     if (rErr && !rErr.message.toLowerCase().includes("duplicate")) {
       setSubmitting(false);
       return toast.error(rErr.message);
+    }
+
+    if (tutorCourses.length > 0) {
+      const { error: cErr } = await supabase
+        .from("tutor_courses")
+        .insert(Array.from(new Set(tutorCourses)).map((course_code) => ({ tutor_id: user.id, course_code })));
+      if (cErr && cErr.code !== "23505") {
+        setSubmitting(false);
+        return toast.error(cErr.message);
+      }
     }
 
     await refreshProfile();
@@ -135,10 +151,43 @@ function BecomeTutor() {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="spec">Topics you specialise in</Label>
-            <Input id="spec" value={specializations} onChange={(e) => setSpecializations(e.target.value)} placeholder="e.g. Calculus, Data Structures, Marketing Analytics" />
-            <p className="text-xs text-muted-foreground">Comma separated — these help students find you.</p>
+          <div>
+            <Label>Courses you can teach</Label>
+            <p className="mt-1 text-xs text-muted-foreground">Pick from the USIU catalogue — filtered by the schools you selected above.</p>
+            {tutorCourses.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {tutorCourses.map((code) => {
+                  const c = allCourses.find((x) => x.code === code);
+                  return (
+                    <Badge key={code} variant="secondary" className="gap-1.5 pr-1">
+                      {code}{c ? ` · ${c.title}` : ""}
+                      <button type="button" aria-label={`Remove ${code}`} onClick={() => setTutorCourses((prev) => prev.filter((x) => x !== code))} className="rounded-sm hover:bg-background/60">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  );
+                })}
+              </div>
+            )}
+            <Input value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} placeholder="Search by code or title…" className="mt-2" />
+            <div className="mt-2 grid max-h-56 gap-1 overflow-y-auto rounded-md border border-border p-2 md:grid-cols-2">
+              {(() => {
+                const pool = tutorSchools.length ? allCourses.filter((c) => tutorSchools.includes(c.school)) : allCourses;
+                const lc = courseFilter.trim().toLowerCase();
+                const list = lc ? pool.filter((c) => c.code.toLowerCase().includes(lc) || c.title.toLowerCase().includes(lc)) : pool;
+                if (allCourses.length === 0) return <p className="text-sm text-muted-foreground">Loading catalogue…</p>;
+                if (list.length === 0) return <p className="text-sm text-muted-foreground">No matching courses.</p>;
+                return list.map((c) => {
+                  const checked = tutorCourses.includes(c.code);
+                  return (
+                    <label key={c.code} className="flex items-start gap-2 rounded px-1.5 py-1 text-sm hover:bg-secondary/50">
+                      <Checkbox checked={checked} onCheckedChange={(v) => setTutorCourses((prev) => v ? (prev.includes(c.code) ? prev : [...prev, c.code]) : prev.filter((x) => x !== c.code))} />
+                      <span><span className="font-medium">{c.code}</span> — {c.title}</span>
+                    </label>
+                  );
+                });
+              })()}
+            </div>
           </div>
 
           <div className="space-y-1.5">

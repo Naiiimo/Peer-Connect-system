@@ -51,7 +51,6 @@ function Register() {
   // Tutor
   const [tutorSchools, setTutorSchools] = useState<string[]>([]);
   const [tutorProgrammes, setTutorProgrammes] = useState<string[]>([]);
-  const [specializations, setSpecializations] = useState<string>("");
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [tutorCourses, setTutorCourses] = useState<string[]>([]);
   const [courseFilter, setCourseFilter] = useState("");
@@ -82,6 +81,7 @@ function Register() {
     if (password !== confirm) return toast.error("Passwords don't match");
     if (role === "student" && (!school || !programme || !year)) return toast.error("Complete school, programme and year");
     if (role === "tutor" && (tutorSchools.length === 0 || tutorProgrammes.length === 0)) return toast.error("Pick your schools and programmes");
+    if (role === "tutor" && tutorCourses.length === 0) return toast.error("Pick at least one course you can teach");
 
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
@@ -115,7 +115,7 @@ function Register() {
     } else {
       update.tutor_schools = tutorSchools;
       update.tutor_programmes = tutorProgrammes;
-      update.specializations = specializations.split(",").map((t) => t.trim()).filter(Boolean);
+      update.specializations = [];
     }
     // Retry a couple times because trigger inserts the profile row asynchronously
     for (let i = 0; i < 3; i++) {
@@ -125,7 +125,7 @@ function Register() {
     }
 
     if (role === "tutor" && tutorCourses.length > 0) {
-      await supabase.from("tutor_courses").insert(tutorCourses.map((c) => ({ tutor_id: uid, course_code: c })));
+      await supabase.from("tutor_courses").insert(Array.from(new Set(tutorCourses)).map((c) => ({ tutor_id: uid, course_code: c })));
     }
 
     setLoading(false);
@@ -230,8 +230,8 @@ function Register() {
                     const checked = tutorProgrammes.includes(p.name);
                     return (
                       <label key={p.name} className="flex items-start gap-2 text-sm">
-                        <Checkbox checked={checked} onCheckedChange={(c) =>
-                          setTutorProgrammes((prev) => c ? [...prev, p.name] : prev.filter((x) => x !== p.name))
+                          <Checkbox checked={checked} onCheckedChange={(c) =>
+                          setTutorProgrammes((prev) => c ? (prev.includes(p.name) ? prev : [...prev, p.name]) : prev.filter((x) => x !== p.name))
                         } />
                         <span>{p.name}</span>
                       </label>
@@ -269,7 +269,7 @@ function Register() {
                       const checked = tutorCourses.includes(c.code);
                       return (
                         <label key={c.code} className="flex items-start gap-2 rounded px-1.5 py-1 text-sm hover:bg-secondary/50">
-                          <Checkbox checked={checked} onCheckedChange={(v) => setTutorCourses((prev) => v ? [...prev, c.code] : prev.filter((x) => x !== c.code))} />
+                          <Checkbox checked={checked} onCheckedChange={(v) => setTutorCourses((prev) => v ? (prev.includes(c.code) ? prev : [...prev, c.code]) : prev.filter((x) => x !== c.code))} />
                           <span><span className="font-medium">{c.code}</span> — {c.title}</span>
                         </label>
                       );
@@ -277,9 +277,6 @@ function Register() {
                   })()}
                 </div>
               </div>
-              <Field label="Specialized topics (comma separated)">
-                <Input value={specializations} onChange={(e) => setSpecializations(e.target.value)} placeholder="e.g. Calculus, Data Structures, Marketing Analytics" />
-              </Field>
               <Field label="Short bio"><Textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Introduce yourself to future students…" /></Field>
             </>
           )}

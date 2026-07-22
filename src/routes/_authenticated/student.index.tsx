@@ -19,7 +19,7 @@ function Overview() {
     if (!user) return;
     const [{ data: t }, { data: s }, { count: uc }, { count: cc }] = await Promise.all([
       supabase.from("profiles")
-        .select("id,full_name,photo_url,avg_rating,tutor_programmes,specializations")
+        .select("id,full_name,photo_url,avg_rating,tutor_programmes,bio")
         .not("tutor_programmes", "eq", "{}")
         .order("avg_rating", { ascending: false })
         .limit(4),
@@ -74,7 +74,7 @@ function Overview() {
                 <img src={t.photo_url ?? `https://api.dicebear.com/9.x/initials/svg?seed=${t.full_name}`} className="h-10 w-10 rounded-full object-cover" alt="" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{t.full_name ?? "Tutor"}</div>
-                  <div className="truncate text-xs text-muted-foreground">{(t.specializations ?? []).slice(0,3).join(" · ") || "USIU tutor"}</div>
+                  <div className="truncate text-xs text-muted-foreground">{t.bio || "USIU tutor"}</div>
                 </div>
                 <div className="flex items-center gap-1 text-xs"><Star className="h-3 w-3 fill-accent text-accent" />{Number(t.avg_rating ?? 0).toFixed(1)}</div>
               </li>

@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MessageSquare, Video } from "lucide-react";
@@ -25,8 +25,12 @@ function Students() {
 
   const load = async () => {
     if (!user) return;
-    const { data } = await supabase.from("connections").select("student_id,student:profiles!connections_student_id_fkey(id,full_name,photo_url,programme,year_of_study)").eq("tutor_id", user.id).eq("status", "accepted");
-    setRows(data ?? []);
+    const { data, error } = await supabase.from("connections").select("student_id").eq("tutor_id", user.id).eq("status", "accepted");
+    if (error) return toast.error(error.message);
+    const studentIds = Array.from(new Set((data ?? []).map((r: any) => r.student_id)));
+    const { data: students } = studentIds.length ? await supabase.from("profiles").select("id,full_name,photo_url,programme,year_of_study").in("id", studentIds) : { data: [] as any[] };
+    const studentMap = Object.fromEntries((students ?? []).map((s: any) => [s.id, s]));
+    setRows((data ?? []).map((r: any) => ({ ...r, student: studentMap[r.student_id] })));
   };
   useEffect(() => { load(); }, [user]);
 
@@ -62,7 +66,10 @@ function Students() {
 
       <Dialog open={!!scheduleFor} onOpenChange={(o) => !o && setScheduleFor(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Schedule session</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Schedule session</DialogTitle>
+            <DialogDescription>Create a session that will appear on the student's schedule.</DialogDescription>
+          </DialogHeader>
           <div className="space-y-3">
             <div><Label>Topic</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} /></div>
             <div className="grid grid-cols-2 gap-3">

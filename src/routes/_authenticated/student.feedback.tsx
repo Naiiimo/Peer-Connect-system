@@ -18,9 +18,12 @@ function Feedback() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data: conns } = await supabase.from("connections").select("tutor:profiles!connections_tutor_id_fkey(id,full_name,photo_url,avg_rating,specializations)").eq("student_id", user.id).eq("status", "accepted");
-      const ts = (conns ?? []).map((c: any) => c.tutor).filter(Boolean);
-      setTutors(ts);
+      const { data: conns } = await supabase.from("connections").select("tutor_id").eq("student_id", user.id).eq("status", "accepted");
+      const tutorIds = Array.from(new Set((conns ?? []).map((c: any) => c.tutor_id)));
+      const { data: ts } = tutorIds.length
+        ? await supabase.from("profiles").select("id,full_name,photo_url,avg_rating").in("id", tutorIds)
+        : { data: [] as any[] };
+      setTutors(ts ?? []);
       const { data: revs } = await supabase.from("reviews").select("*").eq("student_id", user.id);
       const map: any = {};
       (revs ?? []).forEach((r: any) => { map[r.tutor_id] = { rating: r.rating, comment: r.comment ?? "" }; });

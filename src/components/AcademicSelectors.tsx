@@ -51,7 +51,7 @@ export function AcademicPath({
   );
 }
 
-/** Course dropdown filtered by programme code. */
+/** Course dropdown filtered by programme code when available; otherwise shows the full catalogue. */
 export function CourseSelect({
   programmeCode, value, onChange, exclude = [], placeholder = "Select a course",
 }: {
@@ -63,11 +63,11 @@ export function CourseSelect({
 }) {
   const [courses, setCourses] = useState<Course[]>([]);
   useEffect(() => { loadCourses().then(setCourses); }, []);
-  const available = coursesForProgrammeCode(courses, programmeCode).filter((c) => !exclude.includes(c.code));
+  const available = (programmeCode ? coursesForProgrammeCode(courses, programmeCode) : courses).filter((c) => !exclude.includes(c.code));
 
   return (
-    <Select value={value} onValueChange={onChange} disabled={!programmeCode}>
-      <SelectTrigger><SelectValue placeholder={programmeCode ? placeholder : "Pick a programme first"} /></SelectTrigger>
+    <Select value={value} onValueChange={onChange} disabled={courses.length === 0}>
+      <SelectTrigger><SelectValue placeholder={courses.length === 0 ? "Loading courses…" : placeholder} /></SelectTrigger>
       <SelectContent>
         {available.length === 0 && <div className="px-2 py-2 text-xs text-muted-foreground">No courses left for this programme.</div>}
         {available.map((c) => (

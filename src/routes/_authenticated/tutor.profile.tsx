@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { LanguagePicker } from "@/components/LanguagePicker";
 import { MyCourses } from "@/components/MyCourses";
 import { RefineButton } from "@/components/RefineButton";
-import { loadProgrammes, type Programme } from "@/lib/curriculum";
 
 export const Route = createFileRoute("/_authenticated/tutor/profile")({ component: TutorProfile });
 
@@ -24,9 +23,8 @@ function TutorProfile() {
   const nav = useNavigate();
   const [f, setF] = useState<any>({});
   const [programmes, setProgrammes] = useState<any[]>([]);
-  const [specString, setSpecString] = useState("");
 
-  useEffect(() => { setF(profile ?? {}); setSpecString((profile?.specializations ?? []).join(", ")); }, [profile]);
+  useEffect(() => { setF(profile ?? {}); }, [profile]);
   useEffect(() => { supabase.from("programmes").select("school,name").then(({data}) => setProgrammes(data ?? [])); }, []);
 
   const toggleSchool = (s: string) => {
@@ -45,7 +43,7 @@ function TutorProfile() {
     const { error } = await supabase.from("profiles").update({
       full_name: f.full_name, bio: f.bio,
       tutor_schools: f.tutor_schools ?? [], tutor_programmes: f.tutor_programmes ?? [],
-      specializations: specString.split(",").map((s) => s.trim()).filter(Boolean),
+      specializations: [],
       languages: f.languages ?? [],
     }).eq("id", user.id);
     if (error) return toast.error(error.message);
@@ -100,7 +98,6 @@ function TutorProfile() {
             ))}
           </div>
         </div>
-        <div><Label>Specialized topics</Label><Input value={specString} onChange={(e) => setSpecString(e.target.value)} placeholder="Comma separated" /></div>
         <LanguagePicker value={f.languages ?? []} onChange={(langs) => setF({ ...f, languages: langs })} />
         <MyCourses role="tutor" programmeCode={null} />
         <div>
