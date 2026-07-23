@@ -13,9 +13,9 @@ export const LEARNING_STYLES = ["visual", "auditory", "reading", "kinesthetic"] 
 export const GENDERS = ["male", "female", "other"] as const;
 
 export const USIU_ADDRESS = {
-  name: "United States International University - Africa",
+  name: "United States International University Africa",
   street: "USIU Road, Off Thika Road",
-  poBox: "P.O. Box 14634-00800",
+  poBox: "P.O. Box 14634, 00800",
   city: "Nairobi, Kenya",
   phone: "+254 730 116 000",
   email: "admissions@usiu.ac.ke",
