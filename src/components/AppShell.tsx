@@ -42,16 +42,18 @@ export function DashboardShell({ items, children }: { items: NavItem[]; children
 function MobileNav({ items }: { items: NavItem[] }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-border bg-background/95 py-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] md:hidden">
-      {items.slice(0, 5).map((it) => {
-        const active = path === it.to || path.startsWith(it.to + "/");
-        const Icon = it.icon;
-        return (
-          <Link key={it.to} to={it.to as any} className={cn("flex flex-col items-center gap-0.5 px-2 py-1 text-[10px]", active ? "text-primary" : "text-muted-foreground")}>
-            <Icon className="h-4 w-4" />{it.label}
-          </Link>
-        );
-      })}
+    <nav className="fixed inset-x-0 bottom-0 z-40 overflow-x-auto border-t border-border bg-background/95 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 md:hidden">
+      <div className="flex min-w-max items-center gap-1 px-2">
+        {items.map((it) => {
+          const active = path === it.to || path.startsWith(it.to + "/");
+          const Icon = it.icon;
+          return (
+            <Link key={it.to} to={it.to as any} className={cn("flex min-w-[64px] flex-col items-center gap-0.5 px-2 py-1 text-[10px]", active ? "text-primary" : "text-muted-foreground")}>
+              <Icon className="h-4 w-4" />{it.label}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

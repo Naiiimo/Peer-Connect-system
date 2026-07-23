@@ -15,9 +15,7 @@ function Landing() {
       {/* Hero slideshow */}
       <HeroSlideshow>
         <div className="mx-auto max-w-3xl text-primary-foreground">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" /> USIU-Africa Peer Learning
-          </span>
+          <p className="text-xs font-medium uppercase tracking-widest text-white/90">USIU Peer Learning</p>
           <h1 className="mt-4 font-display text-4xl font-bold leading-tight drop-shadow-md md:text-6xl">
             Learn together.<br />
             <span className="bg-gradient-to-r from-accent to-yellow-200 bg-clip-text text-transparent">Grow further.</span>
@@ -75,7 +73,7 @@ function Landing() {
           <div>
             <h4 className="text-sm font-semibold">{USIU_ADDRESS.name}</h4>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li className="flex gap-2"><MapPin className="h-4 w-4 shrink-0" />{USIU_ADDRESS.street} · {USIU_ADDRESS.poBox} · {USIU_ADDRESS.city}</li>
+              <li className="flex gap-2"><MapPin className="h-4 w-4 shrink-0" />{USIU_ADDRESS.street}, {USIU_ADDRESS.poBox}, {USIU_ADDRESS.city}</li>
               <li className="flex gap-2"><Phone className="h-4 w-4 shrink-0" />{USIU_ADDRESS.phone}</li>
               <li className="flex gap-2"><Mail className="h-4 w-4 shrink-0" />{USIU_ADDRESS.email}</li>
             </ul>

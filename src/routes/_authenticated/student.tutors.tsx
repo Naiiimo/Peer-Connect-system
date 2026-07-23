@@ -114,6 +114,18 @@ function MyTutors() {
     if (!user || !booking || !pickedSlot) return;
     const start = nextDateForWeekday(pickedSlot.weekday, pickedSlot.start_time);
     const end = nextDateForWeekday(pickedSlot.weekday, pickedSlot.end_time);
+    // Conflict check: overlapping session for this student OR tutor
+    const { data: clashes } = await supabase
+      .from("sessions")
+      .select("id,tutor_id,student_id,start_at,end_at,status")
+      .or(`tutor_id.eq.${booking.tutorId},student_id.eq.${user.id}`)
+      .lt("start_at", end.toISOString())
+      .gt("end_at", start.toISOString());
+    const active = (clashes ?? []).filter((c: any) => c.status !== "cancelled");
+    if (active.length > 0) {
+      const mine = active.some((c: any) => c.student_id === user.id);
+      return toast.error(mine ? "You already have a session at that time." : "Tutor is no longer available at that time.");
+    }
     const { error } = await supabase.from("sessions").insert({
       tutor_id: booking.tutorId,
       student_id: user.id,
