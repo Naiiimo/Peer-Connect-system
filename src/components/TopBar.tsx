@@ -5,6 +5,7 @@ import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import usiuLogo from "@/assets/usiu-logo.png.asset.json";
 
 export function TopBar({ showNav = true }: { showNav?: boolean }) {
   const { theme, toggle } = useTheme();
