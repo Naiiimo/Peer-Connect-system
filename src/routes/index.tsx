@@ -73,7 +73,7 @@ function Landing() {
           <div>
             <h4 className="text-sm font-semibold">{USIU_ADDRESS.name}</h4>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li className="flex gap-2"><MapPin className="h-4 w-4 shrink-0" />{USIU_ADDRESS.street} · {USIU_ADDRESS.poBox} · {USIU_ADDRESS.city}</li>
+              <li className="flex gap-2"><MapPin className="h-4 w-4 shrink-0" />{USIU_ADDRESS.street}, {USIU_ADDRESS.poBox}, {USIU_ADDRESS.city}</li>
               <li className="flex gap-2"><Phone className="h-4 w-4 shrink-0" />{USIU_ADDRESS.phone}</li>
               <li className="flex gap-2"><Mail className="h-4 w-4 shrink-0" />{USIU_ADDRESS.email}</li>
             </ul>
