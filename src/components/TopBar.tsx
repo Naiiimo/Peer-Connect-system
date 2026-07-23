@@ -5,6 +5,7 @@ import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import usiuLogo from "@/assets/usiu-logo.png.asset.json";
 
 export function TopBar({ showNav = true }: { showNav?: boolean }) {
   const { theme, toggle } = useTheme();
@@ -28,9 +29,7 @@ export function TopBar({ showNav = true }: { showNav?: boolean }) {
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-2 font-display font-bold">
-          <div className="grid h-9 w-9 place-items-center rounded-md gradient-hero text-primary-foreground">
-            <GraduationCap className="h-5 w-5" />
-          </div>
+          <img src={usiuLogo.url} alt="USIU" width={36} height={36} className="h-9 w-9 rounded-md object-contain" />
           <div className="leading-tight">
             <div className="text-sm">USIU</div>
             <div className="text-[10px] font-medium tracking-widest text-muted-foreground">PEER CONNECT</div>

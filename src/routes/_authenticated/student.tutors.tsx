@@ -112,19 +112,31 @@ function MyTutors() {
 
   const confirmBook = async () => {
     if (!user || !booking || !pickedSlot) return;
+    if (pickedSlot.end_time <= pickedSlot.start_time) {
+      return toast.error("This slot has an invalid time range. Ask the tutor to fix it.");
+    }
     const start = nextDateForWeekday(pickedSlot.weekday, pickedSlot.start_time);
     const end = nextDateForWeekday(pickedSlot.weekday, pickedSlot.end_time);
+    if (start.getTime() < Date.now()) {
+      return toast.error("That slot is in the past. Please pick a later time.");
+    }
     // Conflict check: overlapping session for this student OR tutor
     const { data: clashes } = await supabase
       .from("sessions")
-      .select("id,tutor_id,student_id,start_at,end_at,status")
+      .select("id,tutor_id,student_id,start_at,end_at,status,topic")
       .or(`tutor_id.eq.${booking.tutorId},student_id.eq.${user.id}`)
       .lt("start_at", end.toISOString())
       .gt("end_at", start.toISOString());
     const active = (clashes ?? []).filter((c: any) => c.status !== "cancelled");
     if (active.length > 0) {
-      const mine = active.some((c: any) => c.student_id === user.id);
-      return toast.error(mine ? "You already have a session at that time." : "Tutor is no longer available at that time.");
+      const mine = active.find((c: any) => c.student_id === user.id);
+      const conflict = mine ?? active[0];
+      const when = `${new Date(conflict.start_at).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" })}`;
+      return toast.error(
+        mine
+          ? `You already have "${conflict.topic ?? "a session"}" at ${when}.`
+          : `The tutor is already booked at ${when}. Pick a different slot.`
+      );
     }
     const { error } = await supabase.from("sessions").insert({
       tutor_id: booking.tutorId,
@@ -136,7 +148,7 @@ function MyTutors() {
       status: "scheduled",
     });
     if (error) {
-      if (error.code === "23505") return toast.error("That time slot was just booked. Please choose another slot.");
+      if (error.code === "23505") return toast.error("That time slot was just booked by someone else. Please choose another slot.");
       return toast.error(error.message);
     }
     await supabase.from("notifications").insert({
@@ -146,7 +158,7 @@ function MyTutors() {
       body: `${profile?.full_name ?? "A student"} booked ${DAYS[pickedSlot.weekday]} ${pickedSlot.start_time.slice(0,5)}`,
       link: "/tutor/sessions",
     });
-    toast.success("Session booked");
+    toast.success(`Session booked for ${DAYS[pickedSlot.weekday]} ${pickedSlot.start_time.slice(0,5)} — added to your Schedule.`);
     setBooking(null); setTopic(""); setPickedSlot(null); load();
   };
 
