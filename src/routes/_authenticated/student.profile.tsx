@@ -41,12 +41,18 @@ function StudentProfile() {
 
   const uploadPhoto = async (file: File) => {
     if (!user) return;
+    if (!file.type.startsWith("image/")) return toast.error("Please choose an image file.");
+    if (file.size > 5 * 1024 * 1024) return toast.error("Profile photos must be 5 MB or smaller.");
     const path = `${user.id}/avatar-${Date.now()}.${file.name.split(".").pop()}`;
     const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
     if (error) return toast.error(error.message);
-    const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 60*60*24*365);
-    await supabase.from("profiles").update({ photo_url: data?.signedUrl }).eq("id", user.id);
-    refreshProfile();
+    const { data, error: urlError } = await supabase.storage.from("avatars").createSignedUrl(path, 60*60*24*365);
+    if (urlError || !data?.signedUrl) return toast.error(urlError?.message ?? "Could not open the uploaded photo.");
+    const { error: profileError } = await supabase.from("profiles").update({ photo_url: data.signedUrl }).eq("id", user.id);
+    if (profileError) return toast.error(profileError.message);
+    setF((current: any) => ({ ...current, photo_url: data.signedUrl }));
+    await refreshProfile();
+    toast.success("Profile photo updated");
   };
 
   const deleteAccount = async () => {

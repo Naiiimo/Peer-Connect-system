@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { MessageSquare, Video } from "lucide-react";
 import { toast } from "sonner";
 import { ProfileDialog } from "@/components/ProfileDialog";
+import { formatConflict, validateTimeRange } from "@/lib/scheduling";
 
 export const Route = createFileRoute("/_authenticated/tutor/students")({ component: Students });
 
@@ -36,9 +37,20 @@ function Students() {
 
   const schedule = async () => {
     if (!user || !scheduleFor) return;
-    const { error } = await supabase.from("sessions").insert({ tutor_id: user.id, student_id: scheduleFor.student_id, topic, start_at: new Date(start).toISOString(), end_at: new Date(end).toISOString(), zoom_url: zoom || null });
+    const validation = validateTimeRange(start, end);
+    if (validation) return toast.error(validation);
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const { data: clashes, error: clashError } = await supabase.from("sessions")
+      .select("topic,start_at,end_at,tutor_id,student_id,status,cancelled_at")
+      .or(`tutor_id.eq.${user.id},student_id.eq.${scheduleFor.student_id}`)
+      .lt("start_at", endDate.toISOString()).gt("end_at", startDate.toISOString());
+    if (clashError) return toast.error(clashError.message);
+    const conflict = (clashes ?? []).find((item: any) => item.status !== "cancelled" && !item.cancelled_at);
+    if (conflict) return toast.error(formatConflict(conflict, user.id));
+    const { error } = await supabase.from("sessions").insert({ tutor_id: user.id, student_id: scheduleFor.student_id, topic: topic.trim() || "Tutoring session", start_at: startDate.toISOString(), end_at: endDate.toISOString(), zoom_url: zoom || null, status: "scheduled" });
     if (error) return toast.error(error.message);
-    await supabase.from("notifications").insert({ user_id: scheduleFor.student_id, kind: "session_scheduled", title: "New session scheduled", body: `${topic} on ${new Date(start).toLocaleString()}`, link: zoom || null });
+    await supabase.from("notifications").insert({ user_id: scheduleFor.student_id, kind: "session_scheduled", title: "New session scheduled", body: `${topic || "Tutoring session"} on ${startDate.toLocaleString()}`, link: "/student/schedule" });
     toast.success("Session scheduled"); setScheduleFor(null); setTopic(""); setStart(""); setEnd(""); setZoom("");
   };
 

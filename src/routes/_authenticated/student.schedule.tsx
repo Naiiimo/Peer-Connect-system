@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Video, Calendar as CalendarIcon, Clock } from "lucide-react";
+import { Plus, Video, Calendar as CalendarIcon, Clock, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/student/schedule")({ component: Schedule });
@@ -77,6 +77,17 @@ function Schedule() {
     setOpen(false); setTopic(""); setStart(""); setEnd(""); load();
   };
 
+  const cancel = async (session: any) => {
+    if (!user || !confirm("Cancel this session?")) return;
+    const { error } = await supabase.from("sessions").update({ cancelled_at: new Date().toISOString(), status: "cancelled" }).eq("id", session.id);
+    if (error) return toast.error(error.message);
+    if (session.tutor_id !== user.id) {
+      await supabase.from("notifications").insert({ user_id: session.tutor_id, kind: "session_cancelled", title: "Session cancelled", body: `${session.topic ?? "A session"} was cancelled by the student.`, link: "/tutor/sessions" });
+    }
+    toast.success("Session cancelled");
+    load();
+  };
+
   const Row = ({ s, isPast }: { s: any; isPast: boolean }) => {
     const startD = new Date(s.start_at);
     const endD = new Date(s.end_at);
@@ -101,11 +112,10 @@ function Schedule() {
             {withTutor && <div className="mt-0.5 text-xs text-muted-foreground">with {s.tutor.full_name}</div>}
           </div>
         </div>
-        {s.zoom_url && !s.cancelled_at && (
-          <a href={s.zoom_url} target="_blank" rel="noreferrer" className="sm:shrink-0">
-            <Button size="sm" className="w-full sm:w-auto"><Video className="mr-1 h-3 w-3" /> Join meeting</Button>
-          </a>
-        )}
+        {!isPast && !s.cancelled_at && <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
+          {s.zoom_url && <a href={s.zoom_url} target="_blank" rel="noreferrer" className="flex-1 sm:flex-none"><Button size="sm" className="w-full"><Video className="mr-1 h-3 w-3" /> Join meeting</Button></a>}
+          <Button size="sm" variant="outline" onClick={() => cancel(s)} className="flex-1 sm:flex-none"><X className="mr-1 h-3 w-3" /> Cancel</Button>
+        </div>}
       </li>
     );
   };

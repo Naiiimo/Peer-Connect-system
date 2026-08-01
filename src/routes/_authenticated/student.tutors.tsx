@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ProfileDialog } from "@/components/ProfileDialog";
+import { formatConflict } from "@/lib/scheduling";
 
 export const Route = createFileRoute("/_authenticated/student/tutors")({ component: MyTutors });
 
@@ -129,14 +130,8 @@ function MyTutors() {
       .gt("end_at", start.toISOString());
     const active = (clashes ?? []).filter((c: any) => c.status !== "cancelled");
     if (active.length > 0) {
-      const mine = active.find((c: any) => c.student_id === user.id);
-      const conflict = mine ?? active[0];
-      const when = `${new Date(conflict.start_at).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" })}`;
-      return toast.error(
-        mine
-          ? `You already have "${conflict.topic ?? "a session"}" at ${when}.`
-          : `The tutor is already booked at ${when}. Pick a different slot.`
-      );
+      const conflict = active.find((c: any) => c.student_id === user.id) ?? active[0];
+      return toast.error(formatConflict(conflict, user.id));
     }
     const { error } = await supabase.from("sessions").insert({
       tutor_id: booking.tutorId,
@@ -208,14 +203,15 @@ function MyTutors() {
                   <div className="mt-1 flex flex-wrap gap-1.5">
                     {slots.length === 0 && <span className="text-xs text-muted-foreground">Not set</span>}
                     {slots.map((s) => {
-                      const taken = bookedSlotIds.has(s.id);
+                       const taken = bookedSlotIds.has(s.id);
+                       const nextDate = nextDateForWeekday(s.weekday, s.start_time);
                       return (
                         <span
                           key={s.id}
                           className={`rounded-md px-2 py-0.5 text-[10px] ${taken ? "bg-muted text-muted-foreground line-through" : "bg-secondary"}`}
-                          title={taken ? "Already booked" : "Open"}
+                           title={taken ? "Already booked" : `Next opening: ${nextDate.toLocaleDateString([], { month: "short", day: "numeric" })}`}
                         >
-                          {DAYS[s.weekday]} {s.start_time.slice(0,5)}–{s.end_time.slice(0,5)}
+                           {DAYS[s.weekday]} {s.start_time.slice(0,5)}–{s.end_time.slice(0,5)} · {taken ? "Booked" : "Open"}
                         </span>
                       );
                     })}
@@ -256,6 +252,7 @@ function MyTutors() {
                 {bookableSlots.map((s) => {
                   const taken = bookedSlotIds.has(s.id);
                   const selected = pickedSlot?.id === s.id;
+                  const nextDate = nextDateForWeekday(s.weekday, s.start_time);
                   return (
                     <button
                       key={s.id}
@@ -268,7 +265,8 @@ function MyTutors() {
                         "border-border bg-background hover:bg-secondary"
                       }`}
                     >
-                      {DAYS[s.weekday]} {s.start_time.slice(0,5)}–{s.end_time.slice(0,5)}
+                      <span className="block font-medium">{DAYS[s.weekday]} {s.start_time.slice(0,5)}–{s.end_time.slice(0,5)}</span>
+                      <span className="block text-[10px] opacity-75">{taken ? "Already booked" : `Next: ${nextDate.toLocaleDateString([], { month: "short", day: "numeric" })}`}</span>
                     </button>
                   );
                 })}
