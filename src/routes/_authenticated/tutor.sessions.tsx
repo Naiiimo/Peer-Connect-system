@@ -83,7 +83,7 @@ function Sessions() {
     if (clashError) return toast.error(clashError.message);
     const conflict = (clashes ?? []).find((item: any) => item.status !== "cancelled" && !item.cancelled_at);
     if (conflict) return toast.error(formatConflict(conflict, user.id));
-    const { error } = await supabase.from("sessions").update({ start_at: start.toISOString(), end_at: end.toISOString(), reminders_sent: [] }).eq("id", rescheduling.id);
+    const { error } = await supabase.from("sessions").update({ start_at: start.toISOString(), end_at: end.toISOString(), availability_slot_id: null, reminders_sent: [] }).eq("id", rescheduling.id);
     if (error) return toast.error(error.message);
     await supabase.from("notifications").insert({ user_id: rescheduling.student_id, kind: "session_rescheduled", title: "Session rescheduled", body: `${rescheduling.topic ?? "Your session"} moved to ${start.toLocaleString()}`, link: "/student/schedule" });
     toast.success("Session rescheduled");
