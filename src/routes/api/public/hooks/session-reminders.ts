@@ -19,7 +19,17 @@ const WINDOWS: { tag: string; label: string; minsBefore: number; toleranceMin: n
 export const Route = createFileRoute("/api/public/hooks/session-reminders")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const suppliedKey = request.headers.get("apikey") ?? "";
+        const expectedKey = process.env.SUPABASE_ANON_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
+        if (!suppliedKey || !expectedKey || suppliedKey.length !== expectedKey.length) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        const suppliedBytes = new TextEncoder().encode(suppliedKey);
+        const expectedBytes = new TextEncoder().encode(expectedKey);
+        let mismatch = 0;
+        for (let index = 0; index < suppliedBytes.length; index += 1) mismatch |= suppliedBytes[index] ^ expectedBytes[index];
+        if (mismatch !== 0) return new Response("Unauthorized", { status: 401 });
         const url = process.env.SUPABASE_URL!;
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
         if (!url || !key) return new Response("Missing env", { status: 500 });
