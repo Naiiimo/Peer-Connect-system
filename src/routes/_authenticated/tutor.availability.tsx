@@ -30,8 +30,12 @@ function Availability() {
 
   const add = async () => {
     if (!user) return;
+    if (end <= start) return toast.error("End time must be after start time.");
+    const overlap = rows.find((row) => Number(row.weekday) === Number(weekday) && row.start_time < end && row.end_time > start);
+    if (overlap) return toast.error(`This overlaps your ${DAYS[overlap.weekday]} ${overlap.start_time.slice(0,5)}–${overlap.end_time.slice(0,5)} slot.`);
     const { error } = await supabase.from("availability").insert({ tutor_id: user.id, weekday: Number(weekday), start_time: start, end_time: end });
     if (error) return toast.error(error.message);
+    toast.success("Availability added");
     load();
   };
 
@@ -40,7 +44,7 @@ function Availability() {
   return (
     <div>
       <PageHeader title="Availability" description="Set the times students can book you." />
-      <div className="card-elevated mb-6 grid gap-3 p-4 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
+      <div className="card-elevated mb-6 grid gap-3 p-4 sm:grid-cols-2 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
         <div><Label>Day</Label>
           <Select value={weekday} onValueChange={setWeekday}>
             <SelectTrigger><SelectValue /></SelectTrigger>
@@ -49,14 +53,14 @@ function Availability() {
         </div>
         <div><Label>Start</Label><Input type="time" value={start} onChange={(e) => setStart(e.target.value)} /></div>
         <div><Label>End</Label><Input type="time" value={end} onChange={(e) => setEnd(e.target.value)} /></div>
-        <Button onClick={add}><Plus className="mr-1 h-4 w-4" /> Add slot</Button>
+        <Button onClick={add} className="sm:col-span-2 md:col-span-1"><Plus className="mr-1 h-4 w-4" /> Add slot</Button>
       </div>
 
       <ul className="space-y-2">
         {rows.length === 0 && <p className="text-sm text-muted-foreground">No slots set.</p>}
         {rows.map((r) => (
-          <li key={r.id} className="card-elevated flex items-center justify-between p-3">
-            <div className="text-sm"><span className="font-medium">{DAYS[r.weekday]}</span> · {r.start_time.slice(0,5)} – {r.end_time.slice(0,5)}</div>
+          <li key={r.id} className="card-elevated flex items-center justify-between gap-3 p-3">
+            <div className="min-w-0 text-sm"><span className="font-medium">{DAYS[r.weekday]}</span><span className="block text-xs text-muted-foreground sm:inline sm:before:content-['·'] sm:before:mx-2">{r.start_time.slice(0,5)}–{r.end_time.slice(0,5)}</span></div>
             <Button size="icon" variant="ghost" onClick={() => del(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
           </li>
         ))}
