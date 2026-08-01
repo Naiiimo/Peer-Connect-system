@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Upload, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { ProfileDialog } from "@/components/ProfileDialog";
 
 export const Route = createFileRoute("/_authenticated/student/groups/$id")({ component: GroupDetail });
 
@@ -16,7 +17,9 @@ function GroupDetail() {
   const [group, setGroup] = useState<any>(null);
   const [msgs, setMsgs] = useState<any[]>([]);
   const [docs, setDocs] = useState<any[]>([]);
+  const [members, setMembers] = useState<any[]>([]);
   const [body, setBody] = useState("");
+  const [viewProfile, setViewProfile] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   const load = async () => {
@@ -26,13 +29,19 @@ function GroupDetail() {
     setMsgs(m ?? []);
     const { data: d } = await supabase.from("group_documents").select("*, uploader:profiles!group_documents_uploader_id_fkey(full_name)").eq("group_id", id).order("created_at", { ascending: false });
     setDocs(d ?? []);
+    const { data: memberships } = await supabase.from("group_members").select("user_id").eq("group_id", id);
+    const memberIds = (memberships ?? []).map((m: any) => m.user_id);
+    const { data: memberProfiles } = memberIds.length
+      ? await supabase.from("profiles").select("id,full_name,photo_url,role").in("id", memberIds)
+      : { data: [] as any[] };
+    setMembers(memberProfiles ?? []);
   };
   useEffect(() => { load(); }, [id]);
 
   useEffect(() => {
     const ch = supabase.channel(`grp:${id}`).on("postgres_changes",
       { event: "INSERT", schema: "public", table: "group_messages", filter: `group_id=eq.${id}` },
-      (p) => setMsgs((prev) => [...prev, p.new as any])
+      () => load()
     ).subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [id]);
@@ -43,7 +52,8 @@ function GroupDetail() {
     e.preventDefault();
     if (!body.trim() || !user) return;
     const { error } = await supabase.from("group_messages").insert({ group_id: id, sender_id: user.id, body });
-    if (!error) setBody("");
+    if (error) return toast.error(error.message);
+    setBody("");
   };
 
   const uploadDoc = async (file: File) => {
@@ -51,7 +61,11 @@ function GroupDetail() {
     const path = `${user.id}/${Date.now()}-${file.name}`;
     const { error: upErr } = await supabase.storage.from("library").upload(path, file);
     if (upErr) return toast.error(upErr.message);
-    await supabase.from("group_documents").insert({ group_id: id, uploader_id: user.id, name: file.name, path });
+    const { error: docErr } = await supabase.from("group_documents").insert({ group_id: id, uploader_id: user.id, name: file.name, path });
+    if (docErr) {
+      await supabase.storage.from("library").remove([path]);
+      return toast.error(docErr.message);
+    }
     toast.success("Uploaded");
     load();
   };
@@ -64,7 +78,7 @@ function GroupDetail() {
   return (
     <div>
       <PageHeader title={group?.name ?? "Group"} description={group?.topic} />
-      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         <section className="card-elevated flex min-h-0 flex-col overflow-hidden" style={{ height: "65vh" }}>
           <div className="flex-1 overflow-y-auto p-4">
             {msgs.map((m) => {
@@ -72,7 +86,7 @@ function GroupDetail() {
               return (
                 <div key={m.id} className={`mb-2 flex ${mine ? "justify-end" : ""}`}>
                   <div className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${mine ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
-                    {!mine && <div className="text-[10px] font-medium opacity-70">{m.sender?.full_name}</div>}
+                    {!mine && <button type="button" onClick={() => setViewProfile(m.sender_id)} className="text-[10px] font-medium opacity-70 hover:underline">{m.sender?.full_name ?? "Group member"}</button>}
                     {m.body}
                   </div>
                 </div>
@@ -86,7 +100,8 @@ function GroupDetail() {
           </form>
         </section>
 
-        <aside className="card-elevated p-4">
+        <aside className="space-y-5">
+          <section className="card-elevated p-4">
           <div className="mb-2 flex items-center justify-between">
             <h3 className="font-medium">Documents</h3>
             <label className="cursor-pointer">
@@ -105,8 +120,23 @@ function GroupDetail() {
               </li>
             ))}
           </ul>
+          </section>
+          <section className="card-elevated p-4">
+            <h3 className="mb-2 font-medium">Members</h3>
+            <ul className="space-y-1">
+              {members.map((member) => (
+                <li key={member.id}>
+                  <Button variant="ghost" className="h-auto w-full justify-start gap-2 px-2 py-2" onClick={() => setViewProfile(member.id)}>
+                    <img src={member.photo_url ?? `https://api.dicebear.com/9.x/initials/svg?seed=${member.full_name}`} className="h-7 w-7 rounded-full object-cover" alt="" />
+                    <span className="min-w-0 truncate text-sm">{member.full_name}</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </section>
         </aside>
       </div>
+      <ProfileDialog userId={viewProfile} open={!!viewProfile} onOpenChange={(open) => !open && setViewProfile(null)} />
     </div>
   );
 }

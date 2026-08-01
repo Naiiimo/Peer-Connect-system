@@ -20,19 +20,27 @@ function Lib() {
   useEffect(() => { load(); }, [user]);
   const upload = async (file: File) => {
     if (!user) return;
+    if (file.size > 20 * 1024 * 1024) return toast.error("Files must be 20 MB or smaller.");
     const path = `${user.id}/${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("library").upload(path, file);
     if (error) return toast.error(error.message);
-    await supabase.from("library_documents").insert({ owner_id: user.id, name: file.name, path, source: "upload" });
+    const { error: rowError } = await supabase.from("library_documents").insert({ owner_id: user.id, name: file.name, path, source: "upload" });
+    if (rowError) {
+      await supabase.storage.from("library").remove([path]);
+      return toast.error(rowError.message);
+    }
     toast.success("Uploaded"); load();
   };
   const open = async (path: string) => {
-    const { data } = await supabase.storage.from("library").createSignedUrl(path, 3600);
+    const { data, error } = await supabase.storage.from("library").createSignedUrl(path, 3600);
+    if (error) return toast.error(error.message);
     if (data?.signedUrl) window.open(data.signedUrl, "_blank");
   };
   const remove = async (d: any) => {
-    await supabase.storage.from("library").remove([d.path]);
-    await supabase.from("library_documents").delete().eq("id", d.id);
+    const { error } = await supabase.storage.from("library").remove([d.path]);
+    if (error) return toast.error(error.message);
+    const { error: rowError } = await supabase.from("library_documents").delete().eq("id", d.id);
+    if (rowError) return toast.error(rowError.message);
     load();
   };
   return (
