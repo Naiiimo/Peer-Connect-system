@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatConflict, validateTimeRange } from "@/lib/scheduling";
+import { ReminderControls } from "@/components/ReminderControls";
 
 export const Route = createFileRoute("/_authenticated/tutor/sessions")({ component: Sessions });
 
@@ -122,6 +123,7 @@ function Sessions() {
   return (
     <div>
       <PageHeader title="Sessions" description="Upcoming and past sessions — updates live as students book." />
+      <ReminderControls sessions={rows} />
       <section className="mb-6">
         <h2 className="mb-2 text-sm font-medium text-muted-foreground">Upcoming</h2>
         <ul className="space-y-2">
