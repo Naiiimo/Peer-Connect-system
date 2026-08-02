@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async () => {
     const uid = (await supabase.auth.getUser()).data.user!.id;
     const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
-    const isAdmin = (data ?? []).some((r: any) => r.role === "admin");
+    const isAdmin = (data ?? []).some((r: any) => r.role === "admin" || r.role === "super_admin");
     if (!isAdmin) throw redirect({ to: "/student" });
   },
   component: AdminLayout,
