@@ -34,11 +34,15 @@ function AdminLogin() {
       return toast.error(`${error.message} — ${r.attemptsLeft} attempt${r.attemptsLeft === 1 ? "" : "s"} left before a 2-minute lockout.`);
     }
 
+    const { data: roles } = await supabase
+      .from("user_roles").select("role").eq("user_id", data.user!.id);
     const { data: prof } = await supabase
       .from("profiles").select("role").eq("id", data.user!.id).maybeSingle();
     setLoading(false);
 
-    if (prof?.role !== "admin" && prof?.role !== "super_admin") {
+    const isAdmin = (roles ?? []).some((r: any) => r.role === "admin" || r.role === "super_admin")
+      || prof?.role === "admin" || prof?.role === "super_admin";
+    if (!isAdmin) {
       await supabase.auth.signOut();
       return toast.error("This account is not an administrator.");
     }

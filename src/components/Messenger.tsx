@@ -5,6 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Trash2, Pencil, Check, CheckCheck, X } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function Messenger() {
   const { user } = useAuth();
@@ -14,7 +18,18 @@ export function Messenger() {
   const [body, setBody] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editBody, setEditBody] = useState("");
+  const [pendingDelete, setPendingDelete] = useState<any | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    const target = pendingDelete;
+    setPendingDelete(null);
+    const { error } = await supabase.from("messages").delete().eq("id", target.id);
+    if (error) return toast.error(error.message);
+    setMessages((prev) => prev.filter((x) => x.id !== target.id));
+    toast.success("Message deleted");
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -100,12 +115,7 @@ export function Messenger() {
           {messages.map((m) => {
             const mine = m.sender_id === user?.id;
             const isEditing = editingId === m.id;
-            const doDelete = async () => {
-              if (!confirm("Delete this message?")) return;
-              const { error } = await supabase.from("messages").delete().eq("id", m.id);
-              if (error) return toast.error(error.message);
-              setMessages((prev) => prev.filter((x) => x.id !== m.id));
-            };
+            const doDelete = () => setPendingDelete(m);
             const startEdit = () => { setEditingId(m.id); setEditBody(m.body); };
             const saveEdit = async () => {
               const trimmed = editBody.trim();
@@ -174,6 +184,20 @@ export function Messenger() {
           <Button type="submit" size="icon" disabled={!selected || !body.trim()}><Send className="h-4 w-4" /></Button>
         </form>
       </div>
+      <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this message?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This removes the message for everyone in the conversation. It can't be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep message</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

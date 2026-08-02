@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Video, Calendar as CalendarIcon, Clock, X } from "lucide-react";
 import { toast } from "sonner";
+import { ReminderControls } from "@/components/ReminderControls";
 
 export const Route = createFileRoute("/_authenticated/student/schedule")({ component: Schedule });
 
@@ -141,6 +142,8 @@ function Schedule() {
           </DialogContent>
         </Dialog>
       } />
+
+      <ReminderControls sessions={sessions} />
 
       <section className="mb-6">
         <h2 className="mb-2 text-sm font-medium text-muted-foreground">Upcoming</h2>
