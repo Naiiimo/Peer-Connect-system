@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ArrowRight, Loader2, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/student/groups")({ component: Groups });
+export const Route = createFileRoute("/_authenticated/student/groups/")({ component: Groups });
 
 function Groups() {
   const { user, profile } = useAuth();
