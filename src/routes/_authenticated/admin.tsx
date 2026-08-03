@@ -5,7 +5,9 @@ import { LayoutDashboard, Users, Flag, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async () => {
-    const uid = (await supabase.auth.getUser()).data.user!.id;
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user) throw redirect({ to: "/admin-login" });
+    const uid = authData.user.id;
     const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
     const isAdmin = (data ?? []).some((r: any) => r.role === "admin" || r.role === "super_admin");
     if (!isAdmin) throw redirect({ to: "/student" });

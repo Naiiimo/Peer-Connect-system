@@ -42,12 +42,12 @@ import { Route as AuthenticatedStudentProfileRouteImport } from './routes/_authe
 import { Route as AuthenticatedStudentNotificationsRouteImport } from './routes/_authenticated/student.notifications'
 import { Route as AuthenticatedStudentMessagesRouteImport } from './routes/_authenticated/student.messages'
 import { Route as AuthenticatedStudentLibraryRouteImport } from './routes/_authenticated/student.library'
-import { Route as AuthenticatedStudentGroupsRouteImport } from './routes/_authenticated/student.groups'
 import { Route as AuthenticatedStudentFindTutorsRouteImport } from './routes/_authenticated/student.find-tutors'
 import { Route as AuthenticatedStudentFeedbackRouteImport } from './routes/_authenticated/student.feedback'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminDeletionsRouteImport } from './routes/_authenticated/admin.deletions'
+import { Route as AuthenticatedStudentGroupsIndexRouteImport } from './routes/_authenticated/student.groups.index'
 import { Route as ApiPublicHooksSessionRemindersRouteImport } from './routes/api/public/hooks/session-reminders'
 import { Route as AuthenticatedStudentGroupsIdRouteImport } from './routes/_authenticated/student.groups.$id'
 
@@ -235,12 +235,6 @@ const AuthenticatedStudentLibraryRoute =
     path: '/library',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
-const AuthenticatedStudentGroupsRoute =
-  AuthenticatedStudentGroupsRouteImport.update({
-    id: '/groups',
-    path: '/groups',
-    getParentRoute: () => AuthenticatedStudentRoute,
-  } as any)
 const AuthenticatedStudentFindTutorsRoute =
   AuthenticatedStudentFindTutorsRouteImport.update({
     id: '/find-tutors',
@@ -270,6 +264,12 @@ const AuthenticatedAdminDeletionsRoute =
     path: '/deletions',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedStudentGroupsIndexRoute =
+  AuthenticatedStudentGroupsIndexRouteImport.update({
+    id: '/groups/',
+    path: '/groups/',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 const ApiPublicHooksSessionRemindersRoute =
   ApiPublicHooksSessionRemindersRouteImport.update({
     id: '/api/public/hooks/session-reminders',
@@ -278,9 +278,9 @@ const ApiPublicHooksSessionRemindersRoute =
   } as any)
 const AuthenticatedStudentGroupsIdRoute =
   AuthenticatedStudentGroupsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedStudentGroupsRoute,
+    id: '/groups/$id',
+    path: '/groups/$id',
+    getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -300,7 +300,6 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/student/feedback': typeof AuthenticatedStudentFeedbackRoute
   '/student/find-tutors': typeof AuthenticatedStudentFindTutorsRoute
-  '/student/groups': typeof AuthenticatedStudentGroupsRouteWithChildren
   '/student/library': typeof AuthenticatedStudentLibraryRoute
   '/student/messages': typeof AuthenticatedStudentMessagesRoute
   '/student/notifications': typeof AuthenticatedStudentNotificationsRoute
@@ -324,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/tutor/': typeof AuthenticatedTutorIndexRoute
   '/student/groups/$id': typeof AuthenticatedStudentGroupsIdRoute
   '/api/public/hooks/session-reminders': typeof ApiPublicHooksSessionRemindersRoute
+  '/student/groups/': typeof AuthenticatedStudentGroupsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -339,7 +339,6 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/student/feedback': typeof AuthenticatedStudentFeedbackRoute
   '/student/find-tutors': typeof AuthenticatedStudentFindTutorsRoute
-  '/student/groups': typeof AuthenticatedStudentGroupsRouteWithChildren
   '/student/library': typeof AuthenticatedStudentLibraryRoute
   '/student/messages': typeof AuthenticatedStudentMessagesRoute
   '/student/notifications': typeof AuthenticatedStudentNotificationsRoute
@@ -363,6 +362,7 @@ export interface FileRoutesByTo {
   '/tutor': typeof AuthenticatedTutorIndexRoute
   '/student/groups/$id': typeof AuthenticatedStudentGroupsIdRoute
   '/api/public/hooks/session-reminders': typeof ApiPublicHooksSessionRemindersRoute
+  '/student/groups': typeof AuthenticatedStudentGroupsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -383,7 +383,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/student/feedback': typeof AuthenticatedStudentFeedbackRoute
   '/_authenticated/student/find-tutors': typeof AuthenticatedStudentFindTutorsRoute
-  '/_authenticated/student/groups': typeof AuthenticatedStudentGroupsRouteWithChildren
   '/_authenticated/student/library': typeof AuthenticatedStudentLibraryRoute
   '/_authenticated/student/messages': typeof AuthenticatedStudentMessagesRoute
   '/_authenticated/student/notifications': typeof AuthenticatedStudentNotificationsRoute
@@ -407,6 +406,7 @@ export interface FileRoutesById {
   '/_authenticated/tutor/': typeof AuthenticatedTutorIndexRoute
   '/_authenticated/student/groups/$id': typeof AuthenticatedStudentGroupsIdRoute
   '/api/public/hooks/session-reminders': typeof ApiPublicHooksSessionRemindersRoute
+  '/_authenticated/student/groups/': typeof AuthenticatedStudentGroupsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -427,7 +427,6 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/student/feedback'
     | '/student/find-tutors'
-    | '/student/groups'
     | '/student/library'
     | '/student/messages'
     | '/student/notifications'
@@ -451,6 +450,7 @@ export interface FileRouteTypes {
     | '/tutor/'
     | '/student/groups/$id'
     | '/api/public/hooks/session-reminders'
+    | '/student/groups/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -466,7 +466,6 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/student/feedback'
     | '/student/find-tutors'
-    | '/student/groups'
     | '/student/library'
     | '/student/messages'
     | '/student/notifications'
@@ -490,6 +489,7 @@ export interface FileRouteTypes {
     | '/tutor'
     | '/student/groups/$id'
     | '/api/public/hooks/session-reminders'
+    | '/student/groups'
   id:
     | '__root__'
     | '/'
@@ -509,7 +509,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/student/feedback'
     | '/_authenticated/student/find-tutors'
-    | '/_authenticated/student/groups'
     | '/_authenticated/student/library'
     | '/_authenticated/student/messages'
     | '/_authenticated/student/notifications'
@@ -533,6 +532,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tutor/'
     | '/_authenticated/student/groups/$id'
     | '/api/public/hooks/session-reminders'
+    | '/_authenticated/student/groups/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -780,13 +780,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentLibraryRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
-    '/_authenticated/student/groups': {
-      id: '/_authenticated/student/groups'
-      path: '/groups'
-      fullPath: '/student/groups'
-      preLoaderRoute: typeof AuthenticatedStudentGroupsRouteImport
-      parentRoute: typeof AuthenticatedStudentRoute
-    }
     '/_authenticated/student/find-tutors': {
       id: '/_authenticated/student/find-tutors'
       path: '/find-tutors'
@@ -822,6 +815,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDeletionsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/student/groups/': {
+      id: '/_authenticated/student/groups/'
+      path: '/groups'
+      fullPath: '/student/groups/'
+      preLoaderRoute: typeof AuthenticatedStudentGroupsIndexRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
     '/api/public/hooks/session-reminders': {
       id: '/api/public/hooks/session-reminders'
       path: '/api/public/hooks/session-reminders'
@@ -831,10 +831,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/student/groups/$id': {
       id: '/_authenticated/student/groups/$id'
-      path: '/$id'
+      path: '/groups/$id'
       fullPath: '/student/groups/$id'
       preLoaderRoute: typeof AuthenticatedStudentGroupsIdRouteImport
-      parentRoute: typeof AuthenticatedStudentGroupsRoute
+      parentRoute: typeof AuthenticatedStudentRoute
     }
   }
 }
@@ -856,24 +856,9 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
-interface AuthenticatedStudentGroupsRouteChildren {
-  AuthenticatedStudentGroupsIdRoute: typeof AuthenticatedStudentGroupsIdRoute
-}
-
-const AuthenticatedStudentGroupsRouteChildren: AuthenticatedStudentGroupsRouteChildren =
-  {
-    AuthenticatedStudentGroupsIdRoute: AuthenticatedStudentGroupsIdRoute,
-  }
-
-const AuthenticatedStudentGroupsRouteWithChildren =
-  AuthenticatedStudentGroupsRoute._addFileChildren(
-    AuthenticatedStudentGroupsRouteChildren,
-  )
-
 interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentFeedbackRoute: typeof AuthenticatedStudentFeedbackRoute
   AuthenticatedStudentFindTutorsRoute: typeof AuthenticatedStudentFindTutorsRoute
-  AuthenticatedStudentGroupsRoute: typeof AuthenticatedStudentGroupsRouteWithChildren
   AuthenticatedStudentLibraryRoute: typeof AuthenticatedStudentLibraryRoute
   AuthenticatedStudentMessagesRoute: typeof AuthenticatedStudentMessagesRoute
   AuthenticatedStudentNotificationsRoute: typeof AuthenticatedStudentNotificationsRoute
@@ -883,12 +868,13 @@ interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
   AuthenticatedStudentTutorsRoute: typeof AuthenticatedStudentTutorsRoute
   AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
+  AuthenticatedStudentGroupsIdRoute: typeof AuthenticatedStudentGroupsIdRoute
+  AuthenticatedStudentGroupsIndexRoute: typeof AuthenticatedStudentGroupsIndexRoute
 }
 
 const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentFeedbackRoute: AuthenticatedStudentFeedbackRoute,
   AuthenticatedStudentFindTutorsRoute: AuthenticatedStudentFindTutorsRoute,
-  AuthenticatedStudentGroupsRoute: AuthenticatedStudentGroupsRouteWithChildren,
   AuthenticatedStudentLibraryRoute: AuthenticatedStudentLibraryRoute,
   AuthenticatedStudentMessagesRoute: AuthenticatedStudentMessagesRoute,
   AuthenticatedStudentNotificationsRoute:
@@ -899,6 +885,8 @@ const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
   AuthenticatedStudentTutorsRoute: AuthenticatedStudentTutorsRoute,
   AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
+  AuthenticatedStudentGroupsIdRoute: AuthenticatedStudentGroupsIdRoute,
+  AuthenticatedStudentGroupsIndexRoute: AuthenticatedStudentGroupsIndexRoute,
 }
 
 const AuthenticatedStudentRouteWithChildren =

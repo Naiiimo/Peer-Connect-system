@@ -8,7 +8,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Upload, FileText, Trash2, Loader2, ExternalLink } from "lucide-react";
+import { Upload, FileText, Trash2, Loader2, ExternalLink, Download } from "lucide-react";
 import { toast } from "sonner";
 
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -32,7 +32,13 @@ export function LibraryBrowser({ title, description }: { title: string; descript
     if (!user) return;
     const { data, error } = await supabase.from("library_documents").select("*").eq("owner_id", user.id).order("created_at", { ascending: false });
     if (error) return toast.error(error.message);
-    setDocs(data ?? []);
+    const rows = data ?? [];
+    const signed = await Promise.all(rows.map(async (doc: any) => {
+      if (kindOf(doc.name) !== "image") return doc;
+      const result = await supabase.storage.from("library").createSignedUrl(doc.path, 3600);
+      return { ...doc, preview_url: result.data?.signedUrl ?? null };
+    }));
+    setDocs(signed);
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [user]);
 
@@ -41,6 +47,7 @@ export function LibraryBrowser({ title, description }: { title: string; descript
     if (file.size > MAX_BYTES) {
       return toast.error(`"${file.name}" is ${mb(file.size)} — the limit is 20 MB. Please compress it and try again.`);
     }
+    if (file.size === 0) return toast.error(`"${file.name}" is empty and cannot be uploaded.`);
     setUploading(file.name);
     const path = `${user.id}/${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("library").upload(path, file);
@@ -91,10 +98,12 @@ export function LibraryBrowser({ title, description }: { title: string; descript
         {docs.length === 0 && <p className="text-sm text-muted-foreground">Nothing here yet.</p>}
         {docs.map((d) => (
           <div key={d.id} className="card-elevated flex items-center gap-3 p-4">
-            <FileText className="h-8 w-8 text-primary" />
+            {d.preview_url
+              ? <img src={d.preview_url} alt="" className="h-12 w-12 shrink-0 rounded-md border border-border object-cover" />
+              : <FileText className="h-8 w-8 shrink-0 text-primary" />}
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-medium">{d.name}</div>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{d.source ?? "upload"}</div>
+              <div className="text-[10px] text-muted-foreground">{kindOf(d.name).toUpperCase()} · {new Date(d.created_at).toLocaleDateString()}</div>
             </div>
             <Button size="sm" variant="outline" onClick={() => openPreview(d)}>Open</Button>
             <Button size="icon" variant="ghost" onClick={() => setPendingDelete(d)} aria-label="Delete file">
@@ -110,9 +119,10 @@ export function LibraryBrowser({ title, description }: { title: string; descript
           {preview?.kind === "image" && <img src={preview.url} alt={preview.name} className="max-h-[70vh] w-full rounded-md object-contain" />}
           {preview?.kind === "pdf" && <iframe src={preview.url} title={preview.name} className="h-[70vh] w-full rounded-md border border-border" />}
           {preview && (
-            <a href={preview.url} target="_blank" rel="noreferrer" className="text-xs text-primary underline-offset-4 hover:underline">
-              <ExternalLink className="mr-1 inline h-3 w-3" />Open in a new tab
-            </a>
+            <div className="flex flex-wrap gap-3 text-xs text-primary">
+              <a href={preview.url} target="_blank" rel="noreferrer" className="underline-offset-4 hover:underline"><ExternalLink className="mr-1 inline h-3 w-3" />Open in a new tab</a>
+              <a href={preview.url} download={preview.name} className="underline-offset-4 hover:underline"><Download className="mr-1 inline h-3 w-3" />Download</a>
+            </div>
           )}
         </DialogContent>
       </Dialog>
