@@ -147,7 +147,7 @@ function GroupDetail() {
           </div>
           <form onSubmit={send} className="flex gap-2 border-t border-border p-3">
             <Input value={body} onChange={(e) => setBody(e.target.value)} placeholder="Message the group…" />
-            <Button size="icon" type="submit" disabled={sending || !body.trim()}>
+            <Button size="icon" type="submit" disabled={sending || !body.trim()} aria-label="Send message">
               {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </form>
