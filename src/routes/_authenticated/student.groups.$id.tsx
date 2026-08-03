@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Send, Upload, FileText, Loader2 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ProfileDialog } from "@/components/ProfileDialog";
 
@@ -91,6 +90,7 @@ function GroupDetail() {
 
   const uploadDoc = async (file: File) => {
     if (!user) return;
+    if (file.size === 0) return toast.error(`"${file.name}" is empty and cannot be uploaded.`);
     if (file.size > MAX_DOC_BYTES) {
       return toast.error(`"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — the limit is 20 MB.`);
     }
