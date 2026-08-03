@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type Role = "student" | "tutor" | "admin";
+type Role = "student" | "tutor" | "admin" | "super_admin";
 export interface Profile {
   id: string;
   role: Role;
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <Ctx.Provider value={{
       user, session, profile, roles,
       isTutor: roles.includes("tutor"),
-      isAdmin: roles.includes("admin"),
+      isAdmin: roles.includes("admin") || roles.includes("super_admin"),
       loading,
       signOut: async () => { await supabase.auth.signOut(); },
       refreshProfile: async () => { if (user) await loadProfile(user.id); },

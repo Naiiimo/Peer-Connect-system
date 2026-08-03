@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Users } from "lucide-react";
+import { ArrowRight, Loader2, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/student/groups")({ component: Groups });
@@ -21,14 +21,23 @@ function Groups() {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [topic, setTopic] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
 
   const load = async () => {
-    const { data } = await supabase.from("groups").select("id,name,description,topic,school,programme,created_at").order("created_at",{ascending:false}).limit(100);
+    setLoading(true);
+    const { data, error } = await supabase.from("groups").select("id,name,description,topic,school,programme,created_at").order("created_at",{ascending:false}).limit(100);
+    if (error) {
+      setLoading(false);
+      return toast.error(`Could not load study groups: ${error.message}`);
+    }
     setGroups(data ?? []);
     if (user) {
-      const { data: m } = await supabase.from("group_members").select("group_id").eq("user_id", user.id);
+      const { data: m, error: memberError } = await supabase.from("group_members").select("group_id").eq("user_id", user.id);
+      if (memberError) toast.error(`Could not load your memberships: ${memberError.message}`);
       setMyIds(new Set((m ?? []).map((x: any) => x.group_id)));
     }
+    setLoading(false);
   };
   useEffect(() => { load(); }, [user]);
 
@@ -36,19 +45,24 @@ function Groups() {
     if (!user || !name) return;
     const { data, error } = await supabase.from("groups").insert({ name, description: desc, topic, school: profile?.school, programme: profile?.programme, created_by: user.id }).select().single();
     if (error) return toast.error(error.message);
-    await supabase.from("group_members").insert({ group_id: data.id, user_id: user.id });
+    const { error: memberError } = await supabase.from("group_members").insert({ group_id: data.id, user_id: user.id });
+    if (memberError) return toast.error(`Group created, but joining failed: ${memberError.message}`);
     toast.success("Group created");
     setOpen(false); setName(""); setDesc(""); setTopic(""); load();
   };
 
   const toggleJoin = async (g: any) => {
     if (!user) return;
+    setJoiningId(g.id);
     if (myIds.has(g.id)) {
-      await supabase.from("group_members").delete().eq("group_id", g.id).eq("user_id", user.id);
+      const { error } = await supabase.from("group_members").delete().eq("group_id", g.id).eq("user_id", user.id);
+      if (error) { setJoiningId(null); return toast.error(`Could not leave group: ${error.message}`); }
     } else {
-      await supabase.from("group_members").insert({ group_id: g.id, user_id: user.id });
+      const { error } = await supabase.from("group_members").insert({ group_id: g.id, user_id: user.id });
+      if (error) { setJoiningId(null); return toast.error(`Could not join group: ${error.message}`); }
     }
-    load();
+    await load();
+    setJoiningId(null);
   };
 
   return (
@@ -69,7 +83,8 @@ function Groups() {
       } />
 
       <div className="grid gap-4 md:grid-cols-2">
-        {groups.length === 0 && <p className="text-sm text-muted-foreground">No groups yet — start one!</p>}
+        {loading && <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading groups…</p>}
+        {!loading && groups.length === 0 && <p className="text-sm text-muted-foreground">No groups yet — start one!</p>}
         {groups.map((g) => (
           <div key={g.id} className="card-elevated p-5">
             <div className="flex items-start justify-between gap-3">
@@ -82,10 +97,15 @@ function Groups() {
               <Users className="h-5 w-5 text-muted-foreground" />
             </div>
             <div className="mt-4 flex gap-2">
-              <Button size="sm" variant={myIds.has(g.id) ? "outline" : "default"} onClick={() => toggleJoin(g)}>
+              <Button size="sm" variant={myIds.has(g.id) ? "outline" : "default"} disabled={joiningId === g.id} onClick={() => toggleJoin(g)}>
+                {joiningId === g.id && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
                 {myIds.has(g.id) ? "Leave" : "Join"}
               </Button>
-              {myIds.has(g.id) && <Link to="/student/groups/$id" params={{ id: g.id }}><Button size="sm" variant="secondary">Open</Button></Link>}
+              {myIds.has(g.id) && (
+                <Button asChild size="sm" variant="secondary">
+                  <Link to="/student/groups/$id" params={{ id: g.id }}>Open chat <ArrowRight className="ml-1 h-3 w-3" /></Link>
+                </Button>
+              )}
             </div>
           </div>
         ))}

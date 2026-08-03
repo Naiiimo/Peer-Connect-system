@@ -65,6 +65,14 @@ function Register() {
   );
 
   const onPhoto = (f: File | null) => {
+    if (f && !f.type.startsWith("image/")) {
+      toast.error("Profile photos must be image files.");
+      return;
+    }
+    if (f && f.size > 5 * 1024 * 1024) {
+      toast.error(`"${f.name}" is ${(f.size / 1024 / 1024).toFixed(1)} MB — profile photos must be 5 MB or smaller.`);
+      return;
+    }
     setPhotoFile(f);
     setPhotoPreview(f ? URL.createObjectURL(f) : "");
   };

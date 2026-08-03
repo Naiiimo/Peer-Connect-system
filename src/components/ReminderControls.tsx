@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -40,6 +40,15 @@ export function ReminderControls({ sessions }: { sessions: Array<{ id: string; t
     }
   };
 
+  const test = () => {
+    if (typeof Notification === "undefined" || Notification.permission !== "granted") return toast.error("Turn on browser reminders first.");
+    new Notification("Session reminders are ready", { body: `You will be reminded ${prefs.leadMinutes} minutes before upcoming sessions while Peer Connect is open.` });
+  };
+
+  const nextSession = sessions
+    .filter((session) => !session.cancelled_at && new Date(session.start_at).getTime() > Date.now())
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())[0];
+
   // Schedule timers for upcoming sessions while the app is open.
   useEffect(() => {
     if (!prefs.enabled || typeof Notification === "undefined" || Notification.permission !== "granted") return;
@@ -78,6 +87,11 @@ export function ReminderControls({ sessions }: { sessions: Array<{ id: string; t
         </select>
         before a session
       </label>
+      {prefs.enabled && <Button size="icon" variant="ghost" onClick={test} aria-label="Send test reminder" title="Send test reminder"><Send className="h-3.5 w-3.5" /></Button>}
+      <p className="basis-full text-[11px] text-muted-foreground">
+        Browser reminders work while Peer Connect is open. In-app reminders are also sent automatically.
+        {nextSession ? ` Next session: ${new Date(nextSession.start_at).toLocaleString()}.` : " No upcoming session is scheduled."}
+      </p>
     </div>
   );
 }

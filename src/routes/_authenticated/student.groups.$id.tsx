@@ -5,7 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Upload, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, Upload, FileText, Loader2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ProfileDialog } from "@/components/ProfileDialog";
 
@@ -25,6 +26,7 @@ function GroupDetail() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [viewProfile, setViewProfile] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const endRef = useRef<HTMLDivElement>(null);
 
   const hydrateProfiles = useCallback(async (ids: string[]) => {
@@ -37,8 +39,9 @@ function GroupDetail() {
   }, [profileMap]);
 
   const load = useCallback(async () => {
+    setLoading(true);
     const { data: g, error: gErr } = await supabase.from("groups").select("*").eq("id", id).maybeSingle();
-    if (gErr) toast.error(gErr.message);
+    if (gErr) toast.error(`Could not open this group: ${gErr.message}`);
     setGroup(g);
 
     const { data: m, error: mErr } = await supabase.from("group_messages").select("*").eq("group_id", id).order("created_at");
@@ -54,6 +57,7 @@ function GroupDetail() {
     const ids = Array.from(new Set([...memberIds, ...(m ?? []).map((x: any) => x.sender_id), ...(d ?? []).map((x: any) => x.uploader_id)]));
     const map = await hydrateProfiles(ids);
     setMembers(memberIds.map((uid: string) => map[uid]).filter(Boolean));
+    setLoading(false);
   }, [id, hydrateProfiles]);
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
@@ -66,7 +70,9 @@ function GroupDetail() {
         await hydrateProfiles([m.sender_id]);
         setMsgs((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") toast.error("Live chat disconnected. Reopen the group to reconnect.");
+      });
     return () => { supabase.removeChannel(ch); };
   }, [id, hydrateProfiles]);
 
@@ -110,7 +116,12 @@ function GroupDetail() {
 
   return (
     <div>
+      <Button asChild variant="ghost" size="sm" className="mb-2">
+        <Link to="/student/groups"><ArrowLeft className="mr-1 h-4 w-4" /> Study groups</Link>
+      </Button>
       <PageHeader title={group?.name ?? "Group"} description={group?.topic} />
+      {loading && <p className="mb-3 flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Opening group chat…</p>}
+      {!loading && !group && <p className="mb-3 text-sm text-destructive">This group is unavailable or you no longer have access.</p>}
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         <section className="card-elevated flex min-h-0 flex-col overflow-hidden" style={{ height: "65vh" }}>
           <div className="flex-1 overflow-y-auto p-4">
