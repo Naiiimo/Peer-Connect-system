@@ -85,6 +85,21 @@ export function LibraryBrowser({ title, description }: { title: string; descript
     load();
   };
 
+  const visible = docs
+    .filter((d) => {
+      const q = query.trim().toLowerCase();
+      if (!q) return true;
+      return d.name.toLowerCase().includes(q) || kindOf(d.name).includes(q);
+    })
+    .sort((a, b) => {
+      if (sort === "name") return a.name.localeCompare(b.name);
+      if (sort === "type") return kindOf(a.name).localeCompare(kindOf(b.name)) || a.name.localeCompare(b.name);
+      const at = new Date(a.created_at).getTime();
+      const bt = new Date(b.created_at).getTime();
+      return sort === "oldest" ? at - bt : bt - at;
+    });
+
+
   return (
     <div>
       <PageHeader title={title} description={description} actions={
