@@ -226,7 +226,7 @@ function MyTutors() {
                 <Button size="sm" variant="outline" onClick={() => setViewProfile(r.tutor_id)}>View profile</Button>
                 <Link to="/student/messages"><Button size="sm" variant="outline"><MessageSquare className="mr-1 h-3 w-3" /> Message</Button></Link>
                 {r.status === "accepted" && (
-                  <Button size="sm" onClick={() => setBooking({ tutorId: r.tutor_id, tutorName: r.tutor?.full_name ?? "Tutor" })}>
+                  <Button size="sm" onClick={() => setBooking({ tutorId: r.tutor_id, tutorName: r.tutor?.full_name ?? "Tutor", rate: r.tutor?.hourly_rate != null ? Number(r.tutor.hourly_rate) : null })}>
                     <Calendar className="mr-1 h-3 w-3" /> Book session
                   </Button>
                 )}
