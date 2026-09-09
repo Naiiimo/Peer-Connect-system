@@ -27,6 +27,9 @@ export function LibraryBrowser({ title, description }: { title: string; descript
   const [uploading, setUploading] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ name: string; url: string; kind: string } | null>(null);
   const [pendingDelete, setPendingDelete] = useState<any | null>(null);
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<"newest" | "oldest" | "name" | "type">("newest");
+
 
   const load = async () => {
     if (!user) return;
