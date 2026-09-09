@@ -89,6 +89,20 @@ function TutorProfile() {
         </div>
         <div><Label>Full name</Label><Input value={f.full_name ?? ""} onChange={(e) => setF({...f, full_name: e.target.value})} /></div>
         <div>
+          <Label>Hourly rate (KES)</Label>
+          <Input
+            type="number"
+            min={0}
+            step={50}
+            inputMode="decimal"
+            placeholder="e.g. 500 — leave blank if you tutor for free"
+            value={f.hourly_rate ?? ""}
+            onChange={(e) => setF({ ...f, hourly_rate: e.target.value })}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">Students see this rate on your profile and an estimated cost when booking.</p>
+        </div>
+
+        <div>
           <Label>Schools (up to 2)</Label>
           <div className="mt-2 grid gap-2 md:grid-cols-2">
             {SCHOOLS.map((s) => {
