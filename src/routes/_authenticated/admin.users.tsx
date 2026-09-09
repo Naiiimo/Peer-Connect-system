@@ -36,6 +36,15 @@ function AdminUsers() {
     toast.success(`User ${status}`); load();
   };
 
+  const changeRole = async (r: any, role: string) => {
+    if (role === r.role) return;
+    const { error } = await (supabase.rpc as any)("admin_set_user_role", { _user_id: r.id, _role: role });
+    if (error) return toast.error(error.message);
+    toast.success(`${r.full_name ?? "User"} is now a ${role.replace("_", " ")}`);
+    load();
+  };
+
+
   return (
     <div>
       <PageHeader title="Users" description="Suspend or ban misbehaving accounts." />
