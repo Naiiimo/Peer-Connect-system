@@ -40,15 +40,20 @@ function TutorProfile() {
 
   const save = async () => {
     if (!user) return;
+    const rateRaw = String(f.hourly_rate ?? "").trim();
+    const rate = rateRaw === "" ? null : Number(rateRaw);
+    if (rate !== null && (!Number.isFinite(rate) || rate < 0)) return toast.error("Enter a valid hourly rate, or leave it blank for free tutoring.");
     const { error } = await supabase.from("profiles").update({
       full_name: f.full_name, bio: f.bio,
       tutor_schools: f.tutor_schools ?? [], tutor_programmes: f.tutor_programmes ?? [],
       specializations: [],
       languages: f.languages ?? [],
+      hourly_rate: rate,
     }).eq("id", user.id);
     if (error) return toast.error(error.message);
     toast.success("Saved"); refreshProfile();
   };
+
 
   const uploadPhoto = async (file: File) => {
     if (!user) return;
