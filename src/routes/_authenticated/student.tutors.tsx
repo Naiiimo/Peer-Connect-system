@@ -55,7 +55,7 @@ function MyTutors() {
     if (allTutorIds.length) {
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id,full_name,photo_url,school,programme,tutor_schools,tutor_programmes,avg_rating,languages,bio")
+        .select("id,full_name,photo_url,school,programme,tutor_schools,tutor_programmes,avg_rating,hourly_rate,languages,bio")
         .in("id", allTutorIds);
       tutorMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p]));
     }
@@ -181,6 +181,8 @@ function MyTutors() {
                     <span>•</span>
                     <span>{(r.tutor?.tutor_programmes ?? [r.tutor?.programme]).filter(Boolean).slice(0, 2).join(" · ") || "Programme not set"}</span>
                     <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-accent text-accent" />{Number(r.tutor?.avg_rating ?? 0).toFixed(1)}</span>
+                    <Badge variant="secondary" className="text-[10px]">{r.tutor?.hourly_rate ? `KES ${Number(r.tutor.hourly_rate).toLocaleString()}/hr` : "Free"}</Badge>
+
                   </div>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{r.tutor?.bio || "USIU tutor"}</p>
                   {r.tutor?.languages?.length ? (
