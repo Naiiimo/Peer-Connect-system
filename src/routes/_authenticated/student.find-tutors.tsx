@@ -178,8 +178,10 @@ function FindTutors() {
                 <div className="flex items-center gap-2">
                   <button onClick={() => setViewProfile(t.id)} className="truncate font-medium hover:underline">{t.full_name ?? "Tutor"}</button>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground"><Star className="h-3 w-3 fill-accent text-accent" />{Number(t.avg_rating ?? 0).toFixed(1)}</span>
+                  <Badge variant="secondary" className="text-[10px]">{t.hourly_rate ? `KES ${Number(t.hourly_rate).toLocaleString()}/hr` : "Free"}</Badge>
                 </div>
                 <p className="line-clamp-2 text-xs text-muted-foreground">{t.bio || "USIU tutor"}</p>
+
                 <div className="mt-2 flex flex-wrap gap-1">
                   {(tutorCourseMap[t.id] ?? []).map((code: string) => (
                     <Badge key={code} variant="outline" className="text-[10px]" title={codeToTitle[code]}>
