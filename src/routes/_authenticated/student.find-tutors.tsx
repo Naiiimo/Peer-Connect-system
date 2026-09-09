@@ -37,7 +37,7 @@ function FindTutors() {
     setLoading(true);
     let query = supabase
       .from("profiles")
-      .select("id,full_name,email,photo_url,avg_rating,tutor_programmes,bio")
+      .select("id,full_name,email,photo_url,avg_rating,hourly_rate,tutor_programmes,bio")
       .not("tutor_programmes", "eq", "{}");
     if (profile?.programme) query = query.contains("tutor_programmes", [profile.programme]);
     const { data } = await query.limit(50);

@@ -17,6 +17,8 @@ export interface Profile {
   tutor_programmes: string[] | null;
   specializations: string[] | null;
   avg_rating: number | null;
+  hourly_rate: number | null;
+
   learning_style: string | null;
   gender: string | null;
   usiu_id: string | null;
