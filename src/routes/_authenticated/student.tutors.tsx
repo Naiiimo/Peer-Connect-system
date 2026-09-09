@@ -274,7 +274,23 @@ function MyTutors() {
                 })}
               </div>
             </div>
+            {pickedSlot && (() => {
+              const [sh, sm] = pickedSlot.start_time.split(":").map(Number);
+              const [eh, em] = pickedSlot.end_time.split(":").map(Number);
+              const hours = Math.max(0, (eh * 60 + em - sh * 60 - sm) / 60);
+              return (
+                <div className="rounded-md border border-border bg-secondary/40 p-3 text-xs">
+                  <div className="font-medium">{hours.toFixed(1)} hour{hours === 1 ? "" : "s"}</div>
+                  <div className="text-muted-foreground">
+                    {booking?.rate
+                      ? `Estimated cost: KES ${(booking.rate * hours).toLocaleString(undefined, { maximumFractionDigits: 0 })} (KES ${booking.rate.toLocaleString()} per hour). Payment is arranged directly with your tutor.`
+                      : "This tutor does not charge for sessions."}
+                  </div>
+                </div>
+              );
+            })()}
             <Button className="w-full" onClick={confirmBook} disabled={!pickedSlot}>Confirm booking</Button>
+
           </div>
         </DialogContent>
       </Dialog>
