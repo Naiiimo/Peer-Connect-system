@@ -40,15 +40,20 @@ function TutorProfile() {
 
   const save = async () => {
     if (!user) return;
+    const rateRaw = String(f.hourly_rate ?? "").trim();
+    const rate = rateRaw === "" ? null : Number(rateRaw);
+    if (rate !== null && (!Number.isFinite(rate) || rate < 0)) return toast.error("Enter a valid hourly rate, or leave it blank for free tutoring.");
     const { error } = await supabase.from("profiles").update({
       full_name: f.full_name, bio: f.bio,
       tutor_schools: f.tutor_schools ?? [], tutor_programmes: f.tutor_programmes ?? [],
       specializations: [],
       languages: f.languages ?? [],
+      hourly_rate: rate,
     }).eq("id", user.id);
     if (error) return toast.error(error.message);
     toast.success("Saved"); refreshProfile();
   };
+
 
   const uploadPhoto = async (file: File) => {
     if (!user) return;
@@ -83,6 +88,20 @@ function TutorProfile() {
           <label><input type="file" hidden accept="image/*" onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])} /><Button asChild variant="outline" size="sm"><span>Change photo</span></Button></label>
         </div>
         <div><Label>Full name</Label><Input value={f.full_name ?? ""} onChange={(e) => setF({...f, full_name: e.target.value})} /></div>
+        <div>
+          <Label>Hourly rate (KES)</Label>
+          <Input
+            type="number"
+            min={0}
+            step={50}
+            inputMode="decimal"
+            placeholder="e.g. 500 — leave blank if you tutor for free"
+            value={f.hourly_rate ?? ""}
+            onChange={(e) => setF({ ...f, hourly_rate: e.target.value })}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">Students see this rate on your profile and an estimated cost when booking.</p>
+        </div>
+
         <div>
           <Label>Schools (up to 2)</Label>
           <div className="mt-2 grid gap-2 md:grid-cols-2">

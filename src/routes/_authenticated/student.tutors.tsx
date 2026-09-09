@@ -37,7 +37,7 @@ function MyTutors() {
   const [avail, setAvail] = useState<Record<string, Slot[]>>({});
   const [courses, setCourses] = useState<Record<string, Course[]>>({});
   const [bookedSlotIds, setBookedSlotIds] = useState<Set<string>>(new Set());
-  const [booking, setBooking] = useState<{ tutorId: string; tutorName: string } | null>(null);
+  const [booking, setBooking] = useState<{ tutorId: string; tutorName: string; rate: number | null } | null>(null);
   const [topic, setTopic] = useState("");
   const [pickedSlot, setPickedSlot] = useState<Slot | null>(null);
   const [viewProfile, setViewProfile] = useState<string | null>(null);
@@ -55,7 +55,7 @@ function MyTutors() {
     if (allTutorIds.length) {
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id,full_name,photo_url,school,programme,tutor_schools,tutor_programmes,avg_rating,languages,bio")
+        .select("id,full_name,photo_url,school,programme,tutor_schools,tutor_programmes,avg_rating,hourly_rate,languages,bio")
         .in("id", allTutorIds);
       tutorMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p]));
     }
@@ -181,6 +181,8 @@ function MyTutors() {
                     <span>•</span>
                     <span>{(r.tutor?.tutor_programmes ?? [r.tutor?.programme]).filter(Boolean).slice(0, 2).join(" · ") || "Programme not set"}</span>
                     <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 fill-accent text-accent" />{Number(r.tutor?.avg_rating ?? 0).toFixed(1)}</span>
+                    <Badge variant="secondary" className="text-[10px]">{r.tutor?.hourly_rate ? `KES ${Number(r.tutor.hourly_rate).toLocaleString()}/hr` : "Free"}</Badge>
+
                   </div>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{r.tutor?.bio || "USIU tutor"}</p>
                   {r.tutor?.languages?.length ? (
@@ -224,7 +226,7 @@ function MyTutors() {
                 <Button size="sm" variant="outline" onClick={() => setViewProfile(r.tutor_id)}>View profile</Button>
                 <Link to="/student/messages"><Button size="sm" variant="outline"><MessageSquare className="mr-1 h-3 w-3" /> Message</Button></Link>
                 {r.status === "accepted" && (
-                  <Button size="sm" onClick={() => setBooking({ tutorId: r.tutor_id, tutorName: r.tutor?.full_name ?? "Tutor" })}>
+                  <Button size="sm" onClick={() => setBooking({ tutorId: r.tutor_id, tutorName: r.tutor?.full_name ?? "Tutor", rate: r.tutor?.hourly_rate != null ? Number(r.tutor.hourly_rate) : null })}>
                     <Calendar className="mr-1 h-3 w-3" /> Book session
                   </Button>
                 )}
@@ -272,7 +274,23 @@ function MyTutors() {
                 })}
               </div>
             </div>
+            {pickedSlot && (() => {
+              const [sh, sm] = pickedSlot.start_time.split(":").map(Number);
+              const [eh, em] = pickedSlot.end_time.split(":").map(Number);
+              const hours = Math.max(0, (eh * 60 + em - sh * 60 - sm) / 60);
+              return (
+                <div className="rounded-md border border-border bg-secondary/40 p-3 text-xs">
+                  <div className="font-medium">{hours.toFixed(1)} hour{hours === 1 ? "" : "s"}</div>
+                  <div className="text-muted-foreground">
+                    {booking?.rate
+                      ? `Estimated cost: KES ${(booking.rate * hours).toLocaleString(undefined, { maximumFractionDigits: 0 })} (KES ${booking.rate.toLocaleString()} per hour). Payment is arranged directly with your tutor.`
+                      : "This tutor does not charge for sessions."}
+                  </div>
+                </div>
+              );
+            })()}
             <Button className="w-full" onClick={confirmBook} disabled={!pickedSlot}>Confirm booking</Button>
+
           </div>
         </DialogContent>
       </Dialog>

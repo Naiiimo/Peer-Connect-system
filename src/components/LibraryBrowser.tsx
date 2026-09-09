@@ -27,6 +27,9 @@ export function LibraryBrowser({ title, description }: { title: string; descript
   const [uploading, setUploading] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ name: string; url: string; kind: string } | null>(null);
   const [pendingDelete, setPendingDelete] = useState<any | null>(null);
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<"newest" | "oldest" | "name" | "type">("newest");
+
 
   const load = async () => {
     if (!user) return;
@@ -82,6 +85,21 @@ export function LibraryBrowser({ title, description }: { title: string; descript
     load();
   };
 
+  const visible = docs
+    .filter((d) => {
+      const q = query.trim().toLowerCase();
+      if (!q) return true;
+      return d.name.toLowerCase().includes(q) || kindOf(d.name).includes(q);
+    })
+    .sort((a, b) => {
+      if (sort === "name") return a.name.localeCompare(b.name);
+      if (sort === "type") return kindOf(a.name).localeCompare(kindOf(b.name)) || a.name.localeCompare(b.name);
+      const at = new Date(a.created_at).getTime();
+      const bt = new Date(b.created_at).getTime();
+      return sort === "oldest" ? at - bt : bt - at;
+    });
+
+
   return (
     <div>
       <PageHeader title={title} description={description} actions={
@@ -92,11 +110,31 @@ export function LibraryBrowser({ title, description }: { title: string; descript
           </Button>
         </label>
       } />
-      <p className="mb-4 text-xs text-muted-foreground">Files up to 20 MB. Images and PDFs open in a preview; other files download.</p>
+      <p className="mb-3 text-xs text-muted-foreground">Files up to 20 MB. Images and PDFs open in a preview; other files download.</p>
+
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search your files by name or type…" className="pl-9" />
+        </div>
+        <select
+          aria-label="Sort files"
+          className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+          value={sort}
+          onChange={(e) => setSort(e.target.value as typeof sort)}
+        >
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="name">Name A–Z</option>
+          <option value="type">File type</option>
+        </select>
+      </div>
 
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {docs.length === 0 && <p className="text-sm text-muted-foreground">Nothing here yet.</p>}
-        {docs.map((d) => (
+        {docs.length > 0 && visible.length === 0 && <p className="text-sm text-muted-foreground">No files match "{query}".</p>}
+        {visible.map((d) => (
+
           <div key={d.id} className="card-elevated flex items-center gap-3 p-4">
             {d.preview_url
               ? <img src={d.preview_url} alt="" className="h-12 w-12 shrink-0 rounded-md border border-border object-cover" />

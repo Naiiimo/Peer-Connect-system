@@ -36,6 +36,15 @@ function AdminUsers() {
     toast.success(`User ${status}`); load();
   };
 
+  const changeRole = async (r: any, role: string) => {
+    if (role === r.role) return;
+    const { error } = await (supabase.rpc as any)("admin_set_user_role", { _user_id: r.id, _role: role });
+    if (error) return toast.error(error.message);
+    toast.success(`${r.full_name ?? "User"} is now a ${role.replace("_", " ")}`);
+    load();
+  };
+
+
   return (
     <div>
       <PageHeader title="Users" description="Suspend or ban misbehaving accounts." />
@@ -53,7 +62,20 @@ function AdminUsers() {
               <tr key={r.id} className="border-t border-border">
                 <td className="p-3">{r.full_name ?? "—"} {r.deleted_at && <Badge variant="destructive" className="ml-1 text-[10px]">Deleted</Badge>}</td>
                 <td className="p-3 text-muted-foreground">{r.email}</td>
-                <td className="p-3 capitalize">{r.role}</td>
+                <td className="p-3">
+                  <select
+                    aria-label={`Role for ${r.full_name ?? r.email}`}
+                    className="rounded-md border border-input bg-background px-2 py-1 text-xs capitalize"
+                    value={r.role}
+                    onChange={(e) => changeRole(r, e.target.value)}
+                  >
+                    <option value="student">Student</option>
+                    <option value="tutor">Tutor</option>
+                    <option value="admin">Admin</option>
+                    <option value="super_admin">Super admin</option>
+                  </select>
+                </td>
+
                 <td className="p-3"><Badge variant={r.status==="active"?"secondary":r.status==="suspended"?"outline":"destructive"} className="capitalize">{r.status}</Badge></td>
                 <td className="p-3 text-right">
                   <div className="inline-flex gap-1">

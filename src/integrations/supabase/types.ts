@@ -350,6 +350,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           gender: Database["public"]["Enums"]["gender"] | null
+          hourly_rate: number | null
           id: string
           languages: string[]
           learning_style: Database["public"]["Enums"]["learning_style"] | null
@@ -374,6 +375,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           gender?: Database["public"]["Enums"]["gender"] | null
+          hourly_rate?: number | null
           id: string
           languages?: string[]
           learning_style?: Database["public"]["Enums"]["learning_style"] | null
@@ -398,6 +400,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           gender?: Database["public"]["Enums"]["gender"] | null
+          hourly_rate?: number | null
           id?: string
           languages?: string[]
           learning_style?: Database["public"]["Enums"]["learning_style"] | null
@@ -631,6 +634,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_set_user_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
       get_booked_availability_slots: {
         Args: { _tutor_ids: string[] }
         Returns: {
