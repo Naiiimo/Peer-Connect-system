@@ -37,7 +37,7 @@ function MyTutors() {
   const [avail, setAvail] = useState<Record<string, Slot[]>>({});
   const [courses, setCourses] = useState<Record<string, Course[]>>({});
   const [bookedSlotIds, setBookedSlotIds] = useState<Set<string>>(new Set());
-  const [booking, setBooking] = useState<{ tutorId: string; tutorName: string } | null>(null);
+  const [booking, setBooking] = useState<{ tutorId: string; tutorName: string; rate: number | null } | null>(null);
   const [topic, setTopic] = useState("");
   const [pickedSlot, setPickedSlot] = useState<Slot | null>(null);
   const [viewProfile, setViewProfile] = useState<string | null>(null);
