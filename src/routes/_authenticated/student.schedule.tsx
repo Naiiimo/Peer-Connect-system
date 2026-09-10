@@ -199,6 +199,20 @@ function Schedule() {
           {past.map((s) => <Row key={s.id} s={s} isPast />)}
         </ul>
       </section>
+
+      <Dialog open={!!rescheduling} onOpenChange={(o) => !o && setRescheduling(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reschedule session</DialogTitle>
+            <DialogDescription>Your tutor is notified and reminders reset to the new time.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div><Label>Start</Label><Input type="datetime-local" value={newStart} onChange={(e) => setNewStart(e.target.value)} /></div>
+            <div><Label>End</Label><Input type="datetime-local" value={newEnd} onChange={(e) => setNewEnd(e.target.value)} /></div>
+          </div>
+          <Button onClick={saveReschedule}>Save new time</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
