@@ -29,6 +29,9 @@ function Schedule() {
   const [topic, setTopic] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [rescheduling, setRescheduling] = useState<any | null>(null);
+  const [newStart, setNewStart] = useState("");
+  const [newEnd, setNewEnd] = useState("");
 
   const load = async () => {
     if (!user) return;
@@ -87,6 +90,41 @@ function Schedule() {
       await supabase.from("notifications").insert({ user_id: session.tutor_id, kind: "session_cancelled", title: "Session cancelled", body: `${session.topic ?? "A session"} was cancelled by the student.`, link: "/tutor/sessions" });
     }
     toast.success("Session cancelled");
+    load();
+  };
+
+  const openReschedule = (session: any) => {
+    const local = (value: string) => {
+      const date = new Date(value);
+      return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    };
+    setRescheduling(session);
+    setNewStart(local(session.start_at));
+    setNewEnd(local(session.end_at));
+  };
+
+  const saveReschedule = async () => {
+    if (!user || !rescheduling) return;
+    const validation = validateTimeRange(newStart, newEnd);
+    if (validation) return toast.error(validation);
+    const startD = new Date(newStart), endD = new Date(newEnd);
+    const { data: clashes, error: clashError } = await supabase.from("sessions")
+      .select("id,topic,start_at,end_at,tutor_id,student_id,status,cancelled_at")
+      .neq("id", rescheduling.id)
+      .or(`student_id.eq.${user.id},tutor_id.eq.${rescheduling.tutor_id}`)
+      .lt("start_at", endD.toISOString()).gt("end_at", startD.toISOString());
+    if (clashError) return toast.error(clashError.message);
+    const conflict = (clashes ?? []).find((c: any) => c.status !== "cancelled" && !c.cancelled_at);
+    if (conflict) return toast.error(formatConflict(conflict, user.id));
+    const { error } = await supabase.from("sessions")
+      .update({ start_at: startD.toISOString(), end_at: endD.toISOString(), availability_slot_id: null, reminders_sent: [] })
+      .eq("id", rescheduling.id);
+    if (error) return toast.error(error.message);
+    if (rescheduling.tutor_id !== user.id) {
+      await supabase.from("notifications").insert({ user_id: rescheduling.tutor_id, kind: "session_rescheduled", title: "Session rescheduled", body: `${rescheduling.topic ?? "A session"} moved to ${startD.toLocaleString()}`, link: "/tutor/sessions" });
+    }
+    toast.success("Session rescheduled");
+    setRescheduling(null);
     load();
   };
 
