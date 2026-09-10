@@ -154,6 +154,7 @@ function Schedule() {
         </div>
         {!isPast && !s.cancelled_at && <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
           {s.zoom_url && <a href={s.zoom_url} target="_blank" rel="noreferrer" className="flex-1 sm:flex-none"><Button size="sm" className="w-full"><Video className="mr-1 h-3 w-3" /> Join meeting</Button></a>}
+          <Button size="sm" variant="outline" onClick={() => openReschedule(s)} className="flex-1 sm:flex-none"><CalendarClock className="mr-1 h-3 w-3" /> Reschedule</Button>
           <Button size="sm" variant="outline" onClick={() => cancel(s)} className="flex-1 sm:flex-none"><X className="mr-1 h-3 w-3" /> Cancel</Button>
         </div>}
       </li>
