@@ -46,6 +46,7 @@ import { Route as AuthenticatedStudentFindTutorsRouteImport } from './routes/_au
 import { Route as AuthenticatedStudentFeedbackRouteImport } from './routes/_authenticated/student.feedback'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedAdminDeletionsRouteImport } from './routes/_authenticated/admin.deletions'
 import { Route as AuthenticatedStudentGroupsIndexRouteImport } from './routes/_authenticated/student.groups.index'
 import { Route as ApiPublicHooksSessionRemindersRouteImport } from './routes/api/public/hooks/session-reminders'
@@ -258,6 +259,12 @@ const AuthenticatedAdminReportsRoute =
     path: '/reports',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminPaymentsRoute =
+  AuthenticatedAdminPaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminDeletionsRoute =
   AuthenticatedAdminDeletionsRouteImport.update({
     id: '/deletions',
@@ -296,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/auth/$role': typeof AuthRoleRoute
   '/register/$role': typeof RegisterRoleRoute
   '/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/student/feedback': typeof AuthenticatedStudentFeedbackRoute
@@ -335,6 +343,7 @@ export interface FileRoutesByTo {
   '/auth/$role': typeof AuthRoleRoute
   '/register/$role': typeof RegisterRoleRoute
   '/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/student/feedback': typeof AuthenticatedStudentFeedbackRoute
@@ -379,6 +388,7 @@ export interface FileRoutesById {
   '/auth/$role': typeof AuthRoleRoute
   '/register/$role': typeof RegisterRoleRoute
   '/_authenticated/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
+  '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/student/feedback': typeof AuthenticatedStudentFeedbackRoute
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/auth/$role'
     | '/register/$role'
     | '/admin/deletions'
+    | '/admin/payments'
     | '/admin/reports'
     | '/admin/users'
     | '/student/feedback'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/auth/$role'
     | '/register/$role'
     | '/admin/deletions'
+    | '/admin/payments'
     | '/admin/reports'
     | '/admin/users'
     | '/student/feedback'
@@ -505,6 +517,7 @@ export interface FileRouteTypes {
     | '/auth/$role'
     | '/register/$role'
     | '/_authenticated/admin/deletions'
+    | '/_authenticated/admin/payments'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/users'
     | '/_authenticated/student/feedback'
@@ -808,6 +821,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/payments': {
+      id: '/_authenticated/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/deletions': {
       id: '/_authenticated/admin/deletions'
       path: '/deletions'
@@ -841,6 +861,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDeletionsRoute: typeof AuthenticatedAdminDeletionsRoute
+  AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -848,6 +869,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDeletionsRoute: AuthenticatedAdminDeletionsRoute,
+  AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,

@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Video, Calendar as CalendarIcon, Clock, X } from "lucide-react";
+import { Plus, Video, Calendar as CalendarIcon, Clock, X, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 import { ReminderControls } from "@/components/ReminderControls";
+import { formatConflict, validateTimeRange } from "@/lib/scheduling";
 
 export const Route = createFileRoute("/_authenticated/student/schedule")({ component: Schedule });
 
@@ -28,6 +29,9 @@ function Schedule() {
   const [topic, setTopic] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [rescheduling, setRescheduling] = useState<any | null>(null);
+  const [newStart, setNewStart] = useState("");
+  const [newEnd, setNewEnd] = useState("");
 
   const load = async () => {
     if (!user) return;
@@ -89,6 +93,41 @@ function Schedule() {
     load();
   };
 
+  const openReschedule = (session: any) => {
+    const local = (value: string) => {
+      const date = new Date(value);
+      return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    };
+    setRescheduling(session);
+    setNewStart(local(session.start_at));
+    setNewEnd(local(session.end_at));
+  };
+
+  const saveReschedule = async () => {
+    if (!user || !rescheduling) return;
+    const validation = validateTimeRange(newStart, newEnd);
+    if (validation) return toast.error(validation);
+    const startD = new Date(newStart), endD = new Date(newEnd);
+    const { data: clashes, error: clashError } = await supabase.from("sessions")
+      .select("id,topic,start_at,end_at,tutor_id,student_id,status,cancelled_at")
+      .neq("id", rescheduling.id)
+      .or(`student_id.eq.${user.id},tutor_id.eq.${rescheduling.tutor_id}`)
+      .lt("start_at", endD.toISOString()).gt("end_at", startD.toISOString());
+    if (clashError) return toast.error(clashError.message);
+    const conflict = (clashes ?? []).find((c: any) => c.status !== "cancelled" && !c.cancelled_at);
+    if (conflict) return toast.error(formatConflict(conflict, user.id));
+    const { error } = await supabase.from("sessions")
+      .update({ start_at: startD.toISOString(), end_at: endD.toISOString(), availability_slot_id: null, reminders_sent: [] })
+      .eq("id", rescheduling.id);
+    if (error) return toast.error(error.message);
+    if (rescheduling.tutor_id !== user.id) {
+      await supabase.from("notifications").insert({ user_id: rescheduling.tutor_id, kind: "session_rescheduled", title: "Session rescheduled", body: `${rescheduling.topic ?? "A session"} moved to ${startD.toLocaleString()}`, link: "/tutor/sessions" });
+    }
+    toast.success("Session rescheduled");
+    setRescheduling(null);
+    load();
+  };
+
   const Row = ({ s, isPast }: { s: any; isPast: boolean }) => {
     const startD = new Date(s.start_at);
     const endD = new Date(s.end_at);
@@ -115,6 +154,7 @@ function Schedule() {
         </div>
         {!isPast && !s.cancelled_at && <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
           {s.zoom_url && <a href={s.zoom_url} target="_blank" rel="noreferrer" className="flex-1 sm:flex-none"><Button size="sm" className="w-full"><Video className="mr-1 h-3 w-3" /> Join meeting</Button></a>}
+          <Button size="sm" variant="outline" onClick={() => openReschedule(s)} className="flex-1 sm:flex-none"><CalendarClock className="mr-1 h-3 w-3" /> Reschedule</Button>
           <Button size="sm" variant="outline" onClick={() => cancel(s)} className="flex-1 sm:flex-none"><X className="mr-1 h-3 w-3" /> Cancel</Button>
         </div>}
       </li>
@@ -159,6 +199,20 @@ function Schedule() {
           {past.map((s) => <Row key={s.id} s={s} isPast />)}
         </ul>
       </section>
+
+      <Dialog open={!!rescheduling} onOpenChange={(o) => !o && setRescheduling(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reschedule session</DialogTitle>
+            <DialogDescription>Your tutor is notified and reminders reset to the new time.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div><Label>Start</Label><Input type="datetime-local" value={newStart} onChange={(e) => setNewStart(e.target.value)} /></div>
+            <div><Label>End</Label><Input type="datetime-local" value={newEnd} onChange={(e) => setNewEnd(e.target.value)} /></div>
+          </div>
+          <Button onClick={saveReschedule}>Save new time</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

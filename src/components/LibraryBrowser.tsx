@@ -8,7 +8,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Upload, FileText, Trash2, Loader2, ExternalLink, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Upload, FileText, Trash2, Loader2, ExternalLink, Download, Search } from "lucide-react";
 import { toast } from "sonner";
 
 const MAX_BYTES = 20 * 1024 * 1024;
