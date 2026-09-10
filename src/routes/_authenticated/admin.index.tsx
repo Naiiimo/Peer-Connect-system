@@ -93,6 +93,26 @@ function AdminOverview() {
         <KPI icon={<Trash2 />} label="Deleted" value={kpi.deleted} />
       </div>
 
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <KPI icon={<CalendarCheck />} label="Upcoming sessions" value={sessionKpi.upcoming} />
+        <KPI icon={<CalendarCheck />} label="Sessions booked (all time)" value={sessionKpi.total} />
+        <KPI icon={<Wallet />} label="Platform fees earned" value={`${sessionKpi.currency} ${Math.round(sessionKpi.fees).toLocaleString()}`} />
+      </div>
+
+      <section className="card-elevated mt-6 p-5">
+        <h2 className="mb-3 font-display text-lg font-semibold">Latest bookings <span className="text-xs font-normal text-muted-foreground">· live</span></h2>
+        <ul className="space-y-2 text-sm">
+          {live.length === 0 && <li className="text-muted-foreground">No sessions booked yet.</li>}
+          {live.map((s) => (
+            <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2 last:border-0">
+              <span className="truncate">{s.topic ?? "Session"} · {s.tutor?.full_name ?? "Tutor"}</span>
+              <span className="text-xs text-muted-foreground">{new Date(s.start_at).toLocaleString()} · {s.cancelled_at ? "cancelled" : s.status}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section className="card-elevated p-5">
           <h2 className="mb-3 font-display text-lg font-semibold">Registrations & deletions (6 mo)</h2>
