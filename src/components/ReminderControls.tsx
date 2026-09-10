@@ -49,22 +49,42 @@ export function ReminderControls({ sessions }: { sessions: Array<{ id: string; t
     .filter((session) => !session.cancelled_at && new Date(session.start_at).getTime() > Date.now())
     .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())[0];
 
-  // Schedule timers for upcoming sessions while the app is open.
+  // Fire alerts for upcoming sessions. A repeating check keeps working when the
+  // tab is in the background and timers get throttled by the browser.
   useEffect(() => {
     if (!prefs.enabled || typeof Notification === "undefined" || Notification.permission !== "granted") return;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    for (const s of sessions) {
-      if (s.cancelled_at) continue;
-      const fireAt = new Date(s.start_at).getTime() - prefs.leadMinutes * 60_000;
-      const delay = fireAt - Date.now();
-      if (delay <= 0 || delay > 24 * 60 * 60 * 1000) continue;
-      timers.push(setTimeout(() => {
-        new Notification("Upcoming session", {
-          body: `${s.topic ?? "Study session"} starts at ${new Date(s.start_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}.`,
+
+    const sent: Record<string, boolean> = (() => {
+      try { return JSON.parse(sessionStorage.getItem(`${KEY}.sent`) ?? "{}"); } catch { return {}; }
+    })();
+    const remember = () => sessionStorage.setItem(`${KEY}.sent`, JSON.stringify(sent));
+
+    const check = () => {
+      const now = Date.now();
+      for (const s of sessions) {
+        if (s.cancelled_at) continue;
+        const startsAt = new Date(s.start_at).getTime();
+        const fireAt = startsAt - prefs.leadMinutes * 60_000;
+        const key = `${s.id}:${startsAt}:${prefs.leadMinutes}`;
+        if (sent[key] || now < fireAt || now > startsAt) continue;
+        sent[key] = true;
+        remember();
+        const minutes = Math.max(1, Math.round((startsAt - now) / 60_000));
+        const note = new Notification("Upcoming session", {
+          body: `${s.topic ?? "Study session"} starts in ${minutes} min (${new Date(startsAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}).`,
+          tag: key,
+          requireInteraction: true,
         });
-      }, delay));
-    }
-    return () => { timers.forEach(clearTimeout); };
+        note.onclick = () => { window.focus(); note.close(); };
+        toast.info(`${s.topic ?? "Study session"} starts in ${minutes} min.`);
+      }
+    };
+
+    check();
+    const interval = setInterval(check, 30_000);
+    const onVisible = () => { if (document.visibilityState === "visible") check(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { clearInterval(interval); document.removeEventListener("visibilitychange", onVisible); };
   }, [prefs, sessions]);
 
   return (
