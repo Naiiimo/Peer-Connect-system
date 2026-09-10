@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/AppShell";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, GraduationCap, ShieldCheck, Trash2 } from "lucide-react";
+import { Users, GraduationCap, ShieldCheck, Trash2, CalendarCheck, Wallet } from "lucide-react";
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/admin/")({ component: AdminOverview });
@@ -13,6 +13,43 @@ function AdminOverview() {
   const [kpi, setKpi] = useState({ total: 0, students: 0, tutors: 0, deleted: 0 });
   const [monthly, setMonthly] = useState<any[]>([]);
   const [gender, setGender] = useState<any[]>([]);
+  const [sessionKpi, setSessionKpi] = useState({ upcoming: 0, total: 0, fees: 0, currency: "KES" });
+  const [live, setLive] = useState<any[]>([]);
+
+  const loadSessions = async () => {
+    const { data: settings } = await supabase.from("platform_settings").select("service_fee_percent,currency").maybeSingle();
+    const { data: sessions } = await supabase
+      .from("sessions").select("id,tutor_id,student_id,topic,start_at,end_at,status,cancelled_at")
+      .order("start_at", { ascending: false }).limit(500);
+    const booked = (sessions ?? []).filter((s: any) => s.tutor_id !== s.student_id);
+    const tutorIds = Array.from(new Set(booked.map((s: any) => s.tutor_id)));
+    const { data: tutors } = tutorIds.length
+      ? await supabase.from("profiles").select("id,full_name,hourly_rate").in("id", tutorIds)
+      : { data: [] as any[] };
+    const map = Object.fromEntries((tutors ?? []).map((t: any) => [t.id, t]));
+    const rate = Number(settings?.service_fee_percent ?? 10) / 100;
+    const fees = booked
+      .filter((s: any) => !s.cancelled_at && s.status !== "cancelled")
+      .reduce((sum: number, s: any) => {
+        const h = Math.max(0, (new Date(s.end_at).getTime() - new Date(s.start_at).getTime()) / 3_600_000);
+        return sum + Number(map[s.tutor_id]?.hourly_rate ?? 0) * h * rate;
+      }, 0);
+    setSessionKpi({
+      upcoming: booked.filter((s: any) => !s.cancelled_at && new Date(s.start_at).getTime() > Date.now()).length,
+      total: booked.length,
+      fees,
+      currency: settings?.currency ?? "KES",
+    });
+    setLive(booked.slice(0, 8).map((s: any) => ({ ...s, tutor: map[s.tutor_id] })));
+  };
+
+  useEffect(() => {
+    loadSessions();
+    const ch = supabase.channel("admin-sessions")
+      .on("postgres_changes", { event: "*", schema: "public", table: "sessions" }, () => loadSessions())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   useEffect(() => {
     (async () => {
