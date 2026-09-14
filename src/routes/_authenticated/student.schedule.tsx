@@ -12,6 +12,7 @@ import { Plus, Video, Calendar as CalendarIcon, Clock, X, CalendarClock } from "
 import { toast } from "sonner";
 import { ReminderControls } from "@/components/ReminderControls";
 import { formatConflict, validateTimeRange } from "@/lib/scheduling";
+import { SessionPayment } from "@/components/SessionPayment";
 
 export const Route = createFileRoute("/_authenticated/student/schedule")({ component: Schedule });
 
@@ -150,6 +151,7 @@ function Schedule() {
               <Clock className="h-3 w-3" /> {fmtTime(startD)} – {fmtTime(endD)}
             </div>
             {withTutor && <div className="mt-0.5 text-xs text-muted-foreground">with {s.tutor.full_name}</div>}
+            <div className="mt-2"><SessionPayment session={s} role="student" onChange={load} /></div>
           </div>
         </div>
         {!isPast && !s.cancelled_at && <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">

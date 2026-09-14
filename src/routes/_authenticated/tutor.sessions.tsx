@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatConflict, validateTimeRange } from "@/lib/scheduling";
 import { ReminderControls } from "@/components/ReminderControls";
+import { SessionPayment } from "@/components/SessionPayment";
 
 export const Route = createFileRoute("/_authenticated/tutor/sessions")({ component: Sessions });
 
@@ -99,6 +100,7 @@ function Sessions() {
         <div className="min-w-0">
           <div className="truncate text-sm font-medium">{s.topic ?? "Session"} · {s.student?.full_name}</div>
           <div className="text-xs text-muted-foreground">{new Date(s.start_at).toLocaleString()}</div>
+          <div className="mt-2"><SessionPayment session={s} role="tutor" onChange={load} /></div>
         </div>
       </div>
       <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">

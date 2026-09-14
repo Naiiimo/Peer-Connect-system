@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import usiuLogo from "@/assets/usiu-logo.png.asset.json";
+import { ActivityFeed } from "@/components/ActivityFeed";
 
 export function TopBar({ showNav = true }: { showNav?: boolean }) {
   const { theme, toggle } = useTheme();
@@ -46,11 +47,7 @@ export function TopBar({ showNav = true }: { showNav?: boolean }) {
           <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          {user && (
-            <Link to={`${base}/notifications` as any}>
-              <Button variant="ghost" size="icon" aria-label="Notifications"><Bell className="h-4 w-4" /></Button>
-            </Link>
-          )}
+          {user && <ActivityFeed base={base} />}
           <Link to={user ? (`${base}/settings` as any) : "/settings"}>
             <Button variant="ghost" size="icon" aria-label="Settings"><SettingsIcon className="h-4 w-4" /></Button>
           </Link>

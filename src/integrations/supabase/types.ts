@@ -526,11 +526,16 @@ export type Database = {
       }
       sessions: {
         Row: {
+          amount: number | null
           availability_slot_id: string | null
           cancelled_at: string | null
           created_at: string
+          currency: string
           end_at: string
           id: string
+          paid_at: string | null
+          payment_method: string | null
+          payment_status: string
           reminders_sent: string[]
           start_at: string
           status: Database["public"]["Enums"]["session_status"]
@@ -540,11 +545,16 @@ export type Database = {
           zoom_url: string | null
         }
         Insert: {
+          amount?: number | null
           availability_slot_id?: string | null
           cancelled_at?: string | null
           created_at?: string
+          currency?: string
           end_at: string
           id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_status?: string
           reminders_sent?: string[]
           start_at: string
           status?: Database["public"]["Enums"]["session_status"]
@@ -554,11 +564,16 @@ export type Database = {
           zoom_url?: string | null
         }
         Update: {
+          amount?: number | null
           availability_slot_id?: string | null
           cancelled_at?: string | null
           created_at?: string
+          currency?: string
           end_at?: string
           id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_status?: string
           reminders_sent?: string[]
           start_at?: string
           status?: Database["public"]["Enums"]["session_status"]
@@ -681,6 +696,16 @@ export type Database = {
       is_group_member: {
         Args: { _group: string; _user: string }
         Returns: boolean
+      }
+      notify: {
+        Args: {
+          _body: string
+          _kind: string
+          _link: string
+          _title: string
+          _user: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
