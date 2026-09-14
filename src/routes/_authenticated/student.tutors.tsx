@@ -133,6 +133,8 @@ function MyTutors() {
       const conflict = active.find((c: any) => c.student_id === user.id) ?? active[0];
       return toast.error(formatConflict(conflict, user.id));
     }
+    const hours = Math.max(0, (end.getTime() - start.getTime()) / 3_600_000);
+    const amount = booking.rate ? Math.round(booking.rate * hours * 100) / 100 : 0;
     const { error } = await supabase.from("sessions").insert({
       tutor_id: booking.tutorId,
       student_id: user.id,
@@ -141,6 +143,9 @@ function MyTutors() {
       end_at: end.toISOString(),
       availability_slot_id: pickedSlot.id,
       status: "scheduled",
+      amount,
+      currency: "KES",
+      payment_status: amount > 0 ? "unpaid" : "waived",
     });
     if (error) {
       if (error.code === "23505") return toast.error("That time slot was just booked by someone else. Please choose another slot.");
