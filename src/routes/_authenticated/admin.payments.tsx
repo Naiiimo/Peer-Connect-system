@@ -88,10 +88,10 @@ function Payments() {
       <section className="card-elevated mt-6 overflow-x-auto p-0">
         <table className="w-full text-sm">
           <thead className="bg-secondary text-xs text-muted-foreground">
-            <tr><th className="p-3 text-left">Session</th><th className="p-3 text-left">Tutor</th><th className="p-3 text-left">Student</th><th className="p-3 text-left">Hours</th><th className="p-3 text-left">Value</th><th className="p-3 text-left">Fee</th><th className="p-3 text-left">Status</th></tr>
+            <tr><th className="p-3 text-left">Session</th><th className="p-3 text-left">Tutor</th><th className="p-3 text-left">Student</th><th className="p-3 text-left">Hours</th><th className="p-3 text-left">Value</th><th className="p-3 text-left">Fee</th><th className="p-3 text-left">Payment</th><th className="p-3 text-left">Status</th></tr>
           </thead>
           <tbody>
-            {rows.length === 0 && <tr><td colSpan={7} className="p-4 text-muted-foreground">No booked sessions yet.</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={8} className="p-4 text-muted-foreground">No booked sessions yet.</td></tr>}
             {rows.map((r) => {
               const cancelled = !!r.cancelled_at || r.status === "cancelled";
               return (
@@ -102,6 +102,7 @@ function Payments() {
                   <td className="p-3">{hours(r.start_at, r.end_at).toFixed(1)}</td>
                   <td className="p-3">{r.gross > 0 ? money(r.gross) : "Free"}</td>
                   <td className="p-3">{cancelled || r.gross === 0 ? "—" : money(r.gross * feeRate)}</td>
+                  <td className="p-3 capitalize">{r.gross === 0 ? "Free" : (r.payment_status ?? "unpaid")}</td>
                   <td className="p-3 capitalize">{cancelled ? "Cancelled" : r.status}</td>
                 </tr>
               );
