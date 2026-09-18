@@ -34,7 +34,7 @@ export function SessionPayment({ session, role, onChange }: { session: any; role
   const cancelled = !!session.cancelled_at || session.status === "cancelled";
   if (cancelled || amount <= 0) return null;
 
-  const update = async (patch: Record<string, unknown>, msg: string) => {
+  const update = async (patch: any, msg: string) => {
     setBusy(true);
     const { error } = await supabase.from("sessions").update(patch).eq("id", session.id);
     setBusy(false);
