@@ -23,7 +23,7 @@ function Payments() {
     if (settings) { setFee(String(settings.service_fee_percent)); setCurrency(settings.currency); }
 
     const { data: sessions, error } = await supabase
-      .from("sessions").select("id,tutor_id,student_id,topic,start_at,end_at,status,cancelled_at")
+      .from("sessions").select("id,tutor_id,student_id,topic,start_at,end_at,status,cancelled_at,amount,currency,payment_status")
       .order("start_at", { ascending: false }).limit(500);
     if (error) return toast.error(error.message);
 
@@ -36,7 +36,7 @@ function Payments() {
       .filter((s: any) => s.tutor_id !== s.student_id)
       .map((s: any) => {
         const rate = Number(map[s.tutor_id]?.hourly_rate ?? 0);
-        const gross = rate * hours(s.start_at, s.end_at);
+        const gross = Number(s.amount ?? 0) > 0 ? Number(s.amount) : rate * hours(s.start_at, s.end_at);
         return { ...s, tutor: map[s.tutor_id], student: map[s.student_id], gross };
       }));
   };
