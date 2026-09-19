@@ -33,6 +33,7 @@ import { Route as AuthenticatedTutorProfileRouteImport } from './routes/_authent
 import { Route as AuthenticatedTutorNotificationsRouteImport } from './routes/_authenticated/tutor.notifications'
 import { Route as AuthenticatedTutorMessagesRouteImport } from './routes/_authenticated/tutor.messages'
 import { Route as AuthenticatedTutorLibraryRouteImport } from './routes/_authenticated/tutor.library'
+import { Route as AuthenticatedTutorEarningsRouteImport } from './routes/_authenticated/tutor.earnings'
 import { Route as AuthenticatedTutorAvailabilityRouteImport } from './routes/_authenticated/tutor.availability'
 import { Route as AuthenticatedStudentTutorsRouteImport } from './routes/_authenticated/student.tutors'
 import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated/student.settings'
@@ -48,6 +49,7 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedAdminDeletionsRouteImport } from './routes/_authenticated/admin.deletions'
+import { Route as AuthenticatedAdminApprovalsRouteImport } from './routes/_authenticated/admin.approvals'
 import { Route as AuthenticatedStudentGroupsIndexRouteImport } from './routes/_authenticated/student.groups.index'
 import { Route as ApiPublicHooksSessionRemindersRouteImport } from './routes/api/public/hooks/session-reminders'
 import { Route as AuthenticatedStudentGroupsIdRouteImport } from './routes/_authenticated/student.groups.$id'
@@ -182,6 +184,12 @@ const AuthenticatedTutorLibraryRoute =
     path: '/library',
     getParentRoute: () => AuthenticatedTutorRoute,
   } as any)
+const AuthenticatedTutorEarningsRoute =
+  AuthenticatedTutorEarningsRouteImport.update({
+    id: '/earnings',
+    path: '/earnings',
+    getParentRoute: () => AuthenticatedTutorRoute,
+  } as any)
 const AuthenticatedTutorAvailabilityRoute =
   AuthenticatedTutorAvailabilityRouteImport.update({
     id: '/availability',
@@ -271,6 +279,12 @@ const AuthenticatedAdminDeletionsRoute =
     path: '/deletions',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminApprovalsRoute =
+  AuthenticatedAdminApprovalsRouteImport.update({
+    id: '/approvals',
+    path: '/approvals',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedStudentGroupsIndexRoute =
   AuthenticatedStudentGroupsIndexRouteImport.update({
     id: '/groups/',
@@ -302,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/tutor': typeof AuthenticatedTutorRouteWithChildren
   '/auth/$role': typeof AuthRoleRoute
   '/register/$role': typeof RegisterRoleRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -317,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/student/tutors': typeof AuthenticatedStudentTutorsRoute
   '/tutor/availability': typeof AuthenticatedTutorAvailabilityRoute
+  '/tutor/earnings': typeof AuthenticatedTutorEarningsRoute
   '/tutor/library': typeof AuthenticatedTutorLibraryRoute
   '/tutor/messages': typeof AuthenticatedTutorMessagesRoute
   '/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
@@ -342,6 +358,7 @@ export interface FileRoutesByTo {
   '/become-tutor': typeof AuthenticatedBecomeTutorRoute
   '/auth/$role': typeof AuthRoleRoute
   '/register/$role': typeof RegisterRoleRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -357,6 +374,7 @@ export interface FileRoutesByTo {
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/student/tutors': typeof AuthenticatedStudentTutorsRoute
   '/tutor/availability': typeof AuthenticatedTutorAvailabilityRoute
+  '/tutor/earnings': typeof AuthenticatedTutorEarningsRoute
   '/tutor/library': typeof AuthenticatedTutorLibraryRoute
   '/tutor/messages': typeof AuthenticatedTutorMessagesRoute
   '/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
@@ -387,6 +405,7 @@ export interface FileRoutesById {
   '/_authenticated/tutor': typeof AuthenticatedTutorRouteWithChildren
   '/auth/$role': typeof AuthRoleRoute
   '/register/$role': typeof RegisterRoleRoute
+  '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/_authenticated/admin/deletions': typeof AuthenticatedAdminDeletionsRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -402,6 +421,7 @@ export interface FileRoutesById {
   '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/_authenticated/student/tutors': typeof AuthenticatedStudentTutorsRoute
   '/_authenticated/tutor/availability': typeof AuthenticatedTutorAvailabilityRoute
+  '/_authenticated/tutor/earnings': typeof AuthenticatedTutorEarningsRoute
   '/_authenticated/tutor/library': typeof AuthenticatedTutorLibraryRoute
   '/_authenticated/tutor/messages': typeof AuthenticatedTutorMessagesRoute
   '/_authenticated/tutor/notifications': typeof AuthenticatedTutorNotificationsRoute
@@ -432,6 +452,7 @@ export interface FileRouteTypes {
     | '/tutor'
     | '/auth/$role'
     | '/register/$role'
+    | '/admin/approvals'
     | '/admin/deletions'
     | '/admin/payments'
     | '/admin/reports'
@@ -447,6 +468,7 @@ export interface FileRouteTypes {
     | '/student/settings'
     | '/student/tutors'
     | '/tutor/availability'
+    | '/tutor/earnings'
     | '/tutor/library'
     | '/tutor/messages'
     | '/tutor/notifications'
@@ -472,6 +494,7 @@ export interface FileRouteTypes {
     | '/become-tutor'
     | '/auth/$role'
     | '/register/$role'
+    | '/admin/approvals'
     | '/admin/deletions'
     | '/admin/payments'
     | '/admin/reports'
@@ -487,6 +510,7 @@ export interface FileRouteTypes {
     | '/student/settings'
     | '/student/tutors'
     | '/tutor/availability'
+    | '/tutor/earnings'
     | '/tutor/library'
     | '/tutor/messages'
     | '/tutor/notifications'
@@ -516,6 +540,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tutor'
     | '/auth/$role'
     | '/register/$role'
+    | '/_authenticated/admin/approvals'
     | '/_authenticated/admin/deletions'
     | '/_authenticated/admin/payments'
     | '/_authenticated/admin/reports'
@@ -531,6 +556,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/settings'
     | '/_authenticated/student/tutors'
     | '/_authenticated/tutor/availability'
+    | '/_authenticated/tutor/earnings'
     | '/_authenticated/tutor/library'
     | '/_authenticated/tutor/messages'
     | '/_authenticated/tutor/notifications'
@@ -730,6 +756,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTutorLibraryRouteImport
       parentRoute: typeof AuthenticatedTutorRoute
     }
+    '/_authenticated/tutor/earnings': {
+      id: '/_authenticated/tutor/earnings'
+      path: '/earnings'
+      fullPath: '/tutor/earnings'
+      preLoaderRoute: typeof AuthenticatedTutorEarningsRouteImport
+      parentRoute: typeof AuthenticatedTutorRoute
+    }
     '/_authenticated/tutor/availability': {
       id: '/_authenticated/tutor/availability'
       path: '/availability'
@@ -835,6 +868,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDeletionsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/approvals': {
+      id: '/_authenticated/admin/approvals'
+      path: '/approvals'
+      fullPath: '/admin/approvals'
+      preLoaderRoute: typeof AuthenticatedAdminApprovalsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/student/groups/': {
       id: '/_authenticated/student/groups/'
       path: '/groups'
@@ -860,6 +900,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRoute
   AuthenticatedAdminDeletionsRoute: typeof AuthenticatedAdminDeletionsRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
@@ -868,6 +909,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminApprovalsRoute: AuthenticatedAdminApprovalsRoute,
   AuthenticatedAdminDeletionsRoute: AuthenticatedAdminDeletionsRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
@@ -916,6 +958,7 @@ const AuthenticatedStudentRouteWithChildren =
 
 interface AuthenticatedTutorRouteChildren {
   AuthenticatedTutorAvailabilityRoute: typeof AuthenticatedTutorAvailabilityRoute
+  AuthenticatedTutorEarningsRoute: typeof AuthenticatedTutorEarningsRoute
   AuthenticatedTutorLibraryRoute: typeof AuthenticatedTutorLibraryRoute
   AuthenticatedTutorMessagesRoute: typeof AuthenticatedTutorMessagesRoute
   AuthenticatedTutorNotificationsRoute: typeof AuthenticatedTutorNotificationsRoute
@@ -930,6 +973,7 @@ interface AuthenticatedTutorRouteChildren {
 
 const AuthenticatedTutorRouteChildren: AuthenticatedTutorRouteChildren = {
   AuthenticatedTutorAvailabilityRoute: AuthenticatedTutorAvailabilityRoute,
+  AuthenticatedTutorEarningsRoute: AuthenticatedTutorEarningsRoute,
   AuthenticatedTutorLibraryRoute: AuthenticatedTutorLibraryRoute,
   AuthenticatedTutorMessagesRoute: AuthenticatedTutorMessagesRoute,
   AuthenticatedTutorNotificationsRoute: AuthenticatedTutorNotificationsRoute,
