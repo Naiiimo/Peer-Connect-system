@@ -527,6 +527,9 @@ export type Database = {
       sessions: {
         Row: {
           amount: number | null
+          approval_status: string
+          approved_at: string | null
+          approved_by: string | null
           availability_slot_id: string | null
           cancelled_at: string | null
           created_at: string
@@ -537,6 +540,7 @@ export type Database = {
           payment_method: string | null
           payment_status: string
           reminders_sent: string[]
+          review_note: string | null
           start_at: string
           status: Database["public"]["Enums"]["session_status"]
           student_id: string
@@ -546,6 +550,9 @@ export type Database = {
         }
         Insert: {
           amount?: number | null
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           availability_slot_id?: string | null
           cancelled_at?: string | null
           created_at?: string
@@ -556,6 +563,7 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string
           reminders_sent?: string[]
+          review_note?: string | null
           start_at: string
           status?: Database["public"]["Enums"]["session_status"]
           student_id: string
@@ -565,6 +573,9 @@ export type Database = {
         }
         Update: {
           amount?: number | null
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           availability_slot_id?: string | null
           cancelled_at?: string | null
           created_at?: string
@@ -575,6 +586,7 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string
           reminders_sent?: string[]
+          review_note?: string | null
           start_at?: string
           status?: Database["public"]["Enums"]["session_status"]
           student_id?: string

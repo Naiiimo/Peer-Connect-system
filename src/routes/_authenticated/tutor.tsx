@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardShell } from "@/components/AppShell";
-import { LayoutDashboard, Inbox, Users, MessageSquare, Calendar, Video, Library, Bell, User, Settings, BookOpen } from "lucide-react";
+import { LayoutDashboard, Inbox, Users, MessageSquare, Calendar, Video, Library, Bell, User, Settings, BookOpen, Wallet } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tutor")({
   beforeLoad: async () => {
@@ -25,6 +25,7 @@ function TutorLayout() {
     { to: "/tutor/messages", label: "Messages", icon: MessageSquare },
     { to: "/tutor/availability", label: "Availability", icon: Calendar },
     { to: "/tutor/sessions", label: "Sessions", icon: Video },
+    { to: "/tutor/earnings", label: "Earnings", icon: Wallet },
     { to: "/tutor/library", label: "Library", icon: Library },
     { to: "/tutor/research", label: "Research", icon: BookOpen },
     { to: "/tutor/notifications", label: "Notifications", icon: Bell },
