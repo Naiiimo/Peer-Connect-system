@@ -105,6 +105,8 @@ function Sessions() {
       </div>
       <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
         {s.cancelled_at && <Badge variant="destructive">Cancelled</Badge>}
+        {s.approval_status === "pending" && <Badge className="bg-accent text-accent-foreground">Awaiting admin approval</Badge>}
+        {s.approval_status === "rejected" && <Badge variant="destructive">Not approved</Badge>}
         {s.zoom_url && !s.cancelled_at && (
           <a href={s.zoom_url} target="_blank" rel="noreferrer"><Button size="sm"><Video className="mr-1 h-3 w-3" /> Open</Button></a>
         )}
