@@ -145,6 +145,8 @@ function Schedule() {
               {s.cancelled_at ? <Badge variant="destructive" className="text-[10px]">Cancelled</Badge>
                 : isPast ? <Badge variant="secondary" className="text-[10px]">Completed</Badge>
                 : <Badge className="bg-mint text-foreground text-[10px]">Upcoming</Badge>}
+              {withTutor && s.approval_status === "pending" && <Badge className="bg-accent text-accent-foreground text-[10px]">Awaiting admin approval</Badge>}
+              {withTutor && s.approval_status === "rejected" && <Badge variant="destructive" className="text-[10px]">Not approved</Badge>}
             </div>
             <div className="mt-0.5 text-xs text-muted-foreground">{fmtDay(startD)}</div>
             <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
